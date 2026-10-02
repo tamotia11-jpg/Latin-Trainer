@@ -665,7 +665,7 @@ kbd {
 }
 .word-row {
   display: grid;
-  grid-template-columns: 1.3fr 1.5fr auto auto;
+  grid-template-columns: 1.3fr 1.5fr auto;
   gap: 20px;
   align-items: center;
   text-align: left;

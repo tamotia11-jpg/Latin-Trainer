@@ -4,7 +4,7 @@ test("home and complete vocabulary work at each viewport", async ({ page }) => {
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("./");
   await expect(
-    page.getByRole("heading", { name: "A little Latin, remembered." }),
+    page.getByRole("heading", { name: "Choose your practice." }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Vocabulary", exact: true }).click();
   await expect(page.locator(".word-row")).toHaveCount(450);
@@ -44,9 +44,9 @@ test("typed exact, wrong, hint and bounded repeat; keyboard next", async ({
   await expect(page.locator(".feedback .eyebrow")).toHaveText("Exact");
   await page.keyboard.press("Enter");
   await expect(
-    page.getByRole("heading", { name: "Recall, measured." }),
+    page.getByRole("heading", { name: "Practice results" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "See my progress" }).click();
+  await page.getByRole("button", { name: "Choose another practice" }).click();
   await page.getByRole("button", { name: "Custom practice" }).click();
   await page.getByLabel("Skill", { exact: true }).selectOption("el");
   await page.getByLabel("Questions").fill("2");
@@ -80,7 +80,7 @@ test("learn introduction and exam diagnosis have different behavior", async ({
   await expect(
     page.getByRole("textbox", { name: "Your answer" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Today", exact: true }).click();
+  await page.getByRole("button", { name: "Start", exact: true }).click();
   await page.getByRole("button", { name: "Exam test" }).click();
   await page.getByLabel("Questions").fill("1");
   await page
@@ -93,7 +93,7 @@ test("learn introduction and exam diagnosis have different behavior", async ({
   await expect(page.locator(".feedback .meaning")).toHaveCount(0);
   await page.keyboard.press("Enter");
   await expect(
-    page.getByRole("heading", { name: "Recall, measured." }),
+    page.getByRole("heading", { name: "Practice results" }),
   ).toBeVisible();
 });
 test("keyboard MCQ, flashcards and dark mode", async ({ page }) => {

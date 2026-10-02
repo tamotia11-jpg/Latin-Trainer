@@ -31,6 +31,12 @@ test("reload preserves reviews; backup transfers to a separate browser", async (
   await expect(
     page.getByRole("button", { name: /Resume saved session/ }),
   ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Choose your practice." }),
+  ).toBeVisible();
+  await expect(page.locator(".stat-grid, .skill-meter, .resume")).toHaveCount(
+    0,
+  );
   const backup = JSON.parse(await exported(page));
   expect(backup.snapshot.states[0].skill).toBe("le");
   expect(backup.snapshot.attempts).toHaveLength(1);
@@ -47,7 +53,7 @@ test("reload preserves reviews; backup transfers to a separate browser", async (
   await second
     .getByRole("button", { name: "Replace progress with backup" })
     .click();
-  await second.getByRole("button", { name: "Today", exact: true }).click();
+  await second.getByRole("button", { name: "Start", exact: true }).click();
   const restored = JSON.parse(await exported(second));
   expect(restored.snapshot).toEqual(backup.snapshot);
   await other.close();
@@ -57,9 +63,6 @@ test("invalid backup is rejected and review stays saved", async ({ page }) => {
   await sword(page);
   await page.getByRole("button", { name: "First-letter hint" }).click();
   await expect(page.locator(".hint")).toContainText("Starts with");
-  await page.reload();
-  await page.getByRole("button", { name: /Resume saved session/ }).click();
-  await expect(page.locator(".hint")).toContainText("Assisted recall");
   await page.getByRole("textbox", { name: "Your answer" }).fill("sword");
   await page.keyboard.press("Enter");
   await expect(page.locator(".feedback .eyebrow")).toHaveText("Hinted");
@@ -80,7 +83,7 @@ test("another tab cannot submit a stale question; reload recovers", async ({
   await sword(page);
   const second = await context.newPage();
   await second.goto(page.url());
-  await second.getByRole("button", { name: /Resume saved session/ }).click();
+  await sword(second);
   await second.getByRole("button", { name: "First-letter hint" }).click();
   await expect(second.locator(".hint")).toContainText("Starts with");
   await page.getByRole("textbox", { name: "Your answer" }).fill("sword");
@@ -113,7 +116,10 @@ test("storage failure preserves the typed answer and does not claim success", as
   );
   await expect(page.locator(".feedback")).toHaveCount(0);
   await page.reload();
-  await page.getByRole("button", { name: /Resume saved session/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "Choose your practice." }),
+  ).toBeVisible();
+  await sword(page);
   await page.getByRole("textbox", { name: "Your answer" }).fill("sword");
   await page.keyboard.press("Enter");
   await expect(page.locator(".feedback .eyebrow")).toHaveText("Exact");

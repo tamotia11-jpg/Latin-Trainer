@@ -2,7 +2,6 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
-  CalendarDays,
   ChevronLeft,
   Download,
   Command,
@@ -18,14 +17,8 @@ import type {
   Snapshot,
   Word,
 } from "./domain/types";
-import {
-  defaults,
-  filteredWords,
-  sessionScore,
-  wordState,
-} from "./domain/session";
+import { defaults, filteredWords, sessionScore } from "./domain/session";
 import { forms, spellingDiff } from "./domain/grading";
-import { mastery, recall } from "./domain/scheduler";
 import {
   answerSession,
   emptySnapshot,
@@ -52,11 +45,6 @@ const labels: Record<Skill, string> = {
   status: "Verb status",
 };
 type Page = "today" | "practice" | "vocabulary" | "confusions" | "account";
-const date = (s: string) =>
-  new Date(s).toLocaleString("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
 export default function App() {
   const [page, setPage] = useState<Page>("today"),
     [snapshot, setSnapshot] = useState<Snapshot>(emptySnapshot),
@@ -71,6 +59,8 @@ export default function App() {
     [settings, setSettings] = useState<Settings>({
       ...defaults,
       mode: "custom",
+      direction: "le",
+      count: 10,
     }),
     [search, setSearch] = useState(""),
     [hideMeanings, setHideMeanings] = useState(false),
@@ -86,42 +76,18 @@ export default function App() {
     next = useRef<HTMLButtonElement>(null),
     dialog = useRef<HTMLDialogElement>(null);
   const now = new Date();
-  const due = snapshot.states.filter((s) => new Date(s.card.due) <= now);
-  const outcomes = [
-    "Mastered",
-    "Strong",
-    "Learning",
-    "Weak",
-    "New",
-    "Due",
-  ] as const;
-  const counts = Object.fromEntries(
-    outcomes.map((s) => [
-      s,
-      words.filter((w) => wordState(w, snapshot.states, now) === s).length,
-    ]),
-  );
-  const recent = snapshot.attempts
-    .filter((a) => a.outcome !== "Introduced")
-    .slice(0, 100);
-  const accuracy = recent.length
-    ? Math.round(
-        (recent.filter((a) => a.outcome === "Exact").length / recent.length) *
-          100,
-      )
-    : null;
   async function refresh(resume = false) {
     try {
       const loaded = await loadSnapshot();
       setSnapshot(loaded);
-      if (resume) {
+      setError("");
+      if (resume && session) {
         setSession(loaded.activeSession);
         setFeedback(Boolean(loaded.activeSession?.lastGrade));
         setIntro(
           loaded.activeSession?.settings.mode === "learn" ||
             loaded.activeSession?.settings.format === "flash",
         );
-        setError("");
       }
     } catch (e) {
       setError(message(e));
@@ -323,22 +289,11 @@ export default function App() {
     setSession(null);
   }
   const tabs: [Page, string][] = [
-    ["today", "Today"],
+    ["today", "Start"],
     ["practice", "Practice"],
     ["vocabulary", "Vocabulary"],
     ["confusions", "Confusions"],
   ];
-  const strength = (skill: Skill) =>
-    Math.round(
-      (words.reduce((sum, w) => {
-        const s = snapshot.states.find(
-          (s) => s.word_id === w.id && s.skill === skill,
-        );
-        return sum + (s ? recall(s, now) : 0);
-      }, 0) /
-        words.length) *
-        100,
-    );
   const browse = filteredWords(
     words,
     snapshot.states,
@@ -392,20 +347,10 @@ export default function App() {
             aria-current={page === id && !session ? "page" : undefined}
           >
             {label}
-            {id === "confusions" && snapshot.confusions.length > 0 && (
-              <span className="nav-count">{snapshot.confusions.length}</span>
-            )}
           </button>
         ))}
       </nav>
       <main id="main" className="shell">
-        <div className="storage-note">
-          <Download size={18} />
-          <span>
-            Progress is saved in this browser. Export a backup to transfer it to
-            another device. No automatic sync.
-          </span>
-        </div>
         {error && (
           <div className="error" role="alert">
             {error}{" "}
@@ -429,12 +374,12 @@ export default function App() {
               }}
             >
               <ChevronLeft size={16} />
-              Save & return
+              Back to practice
             </button>
             {session.finished && !feedback ? (
               <>
                 <p className="eyebrow">Session complete</p>
-                <h1>Recall, measured.</h1>
+                <h1>Practice results</h1>
                 <p className="muted">
                   First attempts are reported below. Retries help you learn and
                   don’t inflate your score.
@@ -478,7 +423,7 @@ export default function App() {
                 </div>
                 <div className="button-row">
                   <button className="primary" onClick={() => navigate("today")}>
-                    See my progress <ArrowRight size={17} />
+                    Choose another practice <ArrowRight size={17} />
                   </button>
                   {session.attempts.some(
                     (a) => a.outcome !== "Exact" && a.outcome !== "Introduced",
@@ -581,7 +526,7 @@ export default function App() {
                               Hinted:
                                 "Completed with support. Retrieve it independently next time.",
                               Introduced:
-                                "An introduction, not mastery evidence.",
+                                "Word reviewed. Try typed recall to test yourself.",
                             }[session.lastGrade.outcome]}
                         </p>
                         {session.lastGrade.outcome === "Minor typo" && (
@@ -819,71 +764,55 @@ export default function App() {
           <>
             <div className="page-heading">
               <div>
-                <p className="eyebrow">Your daily practice</p>
-                <h1>A little Latin, remembered.</h1>
-                <p className="muted">Retrieve today. Remember tomorrow.</p>
+                <p className="eyebrow">GCSE Latin vocabulary</p>
+                <h1>Choose your practice.</h1>
+                <p className="muted">
+                  Practise meanings, Latin words and principal forms at your own
+                  pace.
+                </p>
               </div>
-              <span className="date-chip">
-                <CalendarDays size={16} />
-                {now.toLocaleDateString("en-GB", {
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                })}
-              </span>
             </div>
             <section className="daily-panel">
               <div>
-                <p className="eyebrow">Ready when you are</p>
-                <h2>
-                  {due.length
-                    ? `${due.length} reviews due`
-                    : "Begin your daily review"}
-                </h2>
+                <p className="eyebrow">Start here</p>
+                <h2>Try 10 Latin words</h2>
                 <p>
-                  {due.length
-                    ? `About ${Math.max(1, Math.ceil((Math.min(due.length + 10, 20) * 18) / 60))} minutes · overdue recall first`
-                    : "Start with 10 new recall cards. Your next reviews will adapt to your answers."}
+                  Type an English meaning. Get feedback after each answer and
+                  revisit any mistakes.
                 </p>
               </div>
               <button
                 className="primary"
-                onClick={() => void start(defaults)}
                 disabled={busy}
+                onClick={() =>
+                  void start({
+                    ...defaults,
+                    mode: "custom",
+                    direction: "le",
+                    count: 10,
+                  })
+                }
               >
-                Start today’s review <ArrowRight size={18} />
+                Start practice <ArrowRight size={18} />
               </button>
             </section>
-            {snapshot.activeSession && !snapshot.activeSession.finished && (
-              <button
-                className="resume"
-                onClick={() => {
-                  setSession(snapshot.activeSession);
-                  setFeedback(Boolean(snapshot.activeSession?.lastGrade));
-                  setIntro(
-                    snapshot.activeSession?.settings.mode === "learn" ||
-                      snapshot.activeSession?.settings.format === "flash",
-                  );
-                }}
-              >
-                Resume saved session · {snapshot.activeSession.cursor} of{" "}
-                {snapshot.activeSession.queue.length} answered{" "}
-                <ArrowRight size={16} />
-              </button>
-            )}
             <div className="workflow-grid">
               {[
                 [
                   "Learn new words",
-                  "Meet the forms, then practise recall.",
+                  "See the forms and meanings, then try recalling them.",
                   "learn",
                 ],
                 [
                   "Custom practice",
-                  "Choose sections, skills and difficulty.",
+                  "Choose sections, translation direction and answer format.",
                   "custom",
                 ],
-                ["Exam test", "A clean diagnosis across the syllabus.", "exam"],
+                [
+                  "Exam test",
+                  "Test yourself and see your answers at the end.",
+                  "exam",
+                ],
               ].map(([title, desc, mode]) => (
                 <button
                   className="workflow"
@@ -897,119 +826,15 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <section>
-              <div className="section-heading">
-                <h2>Your vocabulary, at a glance</h2>
-                <button
-                  className="text-button"
-                  onClick={() => navigate("vocabulary")}
-                >
-                  Browse 450 words <ArrowRight size={15} />
-                </button>
-              </div>
-              <div className="stat-grid">
-                {outcomes.map((x) => (
-                  <div className={"stat stat-" + x.toLowerCase()} key={x}>
-                    <strong>{counts[x]}</strong>
-                    <span>{x === "Due" ? "Due words" : x}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="small muted">
-                A word’s state reflects its weaker direction. Due reviews count
-                each skill separately.
+            <section className="panel">
+              <h2>Look up a word</h2>
+              <p>
+                Browse all 450 teacher-supplied words across 15 sections, with
+                meanings and principal forms.
               </p>
-            </section>
-            <div className="two-col">
-              <section className="panel">
-                <p className="eyebrow">Two distinct skills</p>
-                <h2>Recognition & production</h2>
-                {(["le", "el"] as const).map((s) => (
-                  <div className="skill-meter" key={s}>
-                    <div>
-                      <b>{labels[s]}</b>
-                      <span>{strength(s)}%</span>
-                    </div>
-                    <div className="progress-track">
-                      <span style={{ width: `${strength(s)}%` }} />
-                    </div>
-                  </div>
-                ))}
-                <p className="small muted">
-                  Average predicted recall across all 450 words, with unseen
-                  words at zero.
-                </p>
-              </section>
-              <section className="panel">
-                <p className="eyebrow">Retrieval history</p>
-                <h2>
-                  {accuracy === null
-                    ? "Your first chapter"
-                    : `${accuracy}% exact recall`}
-                </h2>
-                <p className="muted">
-                  {recent.length
-                    ? "Recent independent and assisted attempts, with hints and typos excluded from the numerator."
-                    : "Typed answers will build a history here. Self-reported flashcards never count as successful retrieval."}
-                </p>
-                <div className="inline-stats">
-                  <span>
-                    <b>{snapshot.attempts.length}</b> recent reviews
-                  </span>
-                  <span>
-                    <b>
-                      {snapshot.confusions.filter((c) => c.count >= 2).length}
-                    </b>{" "}
-                    recurring confusions
-                  </span>
-                </div>
-              </section>
-            </div>
-            <section>
-              <div className="section-heading">
-                <h2>Progress by section</h2>
-                <span className="small muted">
-                  Strong or mastered in both directions
-                </span>
-              </div>
-              <div className="section-progress">
-                {Array.from({ length: 15 }, (_, i) => i + 1).map((n) => {
-                  const p = words.filter((w) => w.section === n);
-                  const known = p.filter((w) =>
-                    ["Strong", "Mastered"].includes(
-                      wordState(w, snapshot.states, now),
-                    ),
-                  ).length;
-                  return (
-                    <button
-                      key={n}
-                      onClick={() => {
-                        setSettings({
-                          ...defaults,
-                          sections: [n],
-                          mode: "custom",
-                        });
-                        navigate("practice");
-                      }}
-                    >
-                      <div>
-                        <b>Section {n}</b>
-                        <span>
-                          {known}/{p.length}
-                        </span>
-                      </div>
-                      <div className="progress-track">
-                        <span
-                          style={{ width: `${(known / p.length) * 100}%` }}
-                        />
-                      </div>
-                      <small>
-                        {p[0].latin} – {p[p.length - 1].latin}
-                      </small>
-                    </button>
-                  );
-                })}
-              </div>
+              <button onClick={() => navigate("vocabulary")}>
+                Browse vocabulary <ArrowRight size={17} />
+              </button>
             </section>
           </>
         ) : page === "practice" ? (
@@ -1082,7 +907,8 @@ export default function App() {
                 <Select
                   label="Purpose"
                   value={settings.mode}
-                  values={["custom", "daily", "learn", "exam"]}
+                  values={["custom", "learn", "exam"]}
+                  texts={["Practice", "Learn words", "Exam test"]}
                   onChange={(v) =>
                     setSettings({ ...settings, mode: v as Settings["mode"] })
                   }
@@ -1139,17 +965,6 @@ export default function App() {
                     "unknown",
                   ]}
                   onChange={(v) => setSettings({ ...settings, pos: v })}
-                />
-                <Select
-                  label="Learning state"
-                  value={settings.filter}
-                  values={["all", "weak", "new", "due", "mastered", "confused"]}
-                  onChange={(v) =>
-                    setSettings({
-                      ...settings,
-                      filter: v as Settings["filter"],
-                    })
-                  }
                 />
                 <label className="field">
                   Questions{" "}
@@ -1210,18 +1025,6 @@ export default function App() {
                 {hideMeanings ? "Show meanings" : "Hide meanings"}
               </button>
               <Select
-                label="State"
-                value={settings.filter}
-                values={["all", "weak", "new", "due", "mastered", "confused"]}
-                onChange={(v) =>
-                  setSettings({
-                    ...settings,
-                    sections: defaults.sections,
-                    filter: v as Settings["filter"],
-                  })
-                }
-              />
-              <Select
                 label="Section"
                 value={
                   settings.sections.length === 1
@@ -1241,7 +1044,7 @@ export default function App() {
               />
             </div>
             <p className="muted small">
-              {browse.length} entries · Select a word for history, grammar and
+              {browse.length} entries · Select a word for forms, grammar and
               targeted practice.
             </p>
             <div className="word-list">
@@ -1256,14 +1059,6 @@ export default function App() {
                     <small>{w.principalForms || w.type}</small>
                   </div>
                   <span>{hideMeanings ? "Meaning hidden" : w.meaningText}</span>
-                  <span
-                    className={
-                      "badge badge-" +
-                      wordState(w, snapshot.states, now).toLowerCase()
-                    }
-                  >
-                    {wordState(w, snapshot.states, now)}
-                  </span>
                   <ArrowRight size={16} />
                 </button>
               ))}
@@ -1322,10 +1117,6 @@ export default function App() {
                           </small>
                         </div>
                       </div>
-                      <p className="small muted">
-                        {c.count} substitution{c.count !== 1 ? "s" : ""} ·{" "}
-                        {date(c.last_seen)}
-                      </p>
                       <button
                         onClick={() =>
                           void start({
@@ -1348,7 +1139,7 @@ export default function App() {
           <Backup
             onNotice={setNotice}
             onError={setError}
-            onRefresh={() => refresh(true)}
+            onRefresh={() => refresh()}
           />
         )}
       </main>
@@ -1357,7 +1148,7 @@ export default function App() {
           Vocabulary and reference trainer created by your Latin teacher.
         </span>
         <span>
-          <Command size={14} /> Keyboard-first · Thoughtful daily practice.
+          <Command size={14} /> Keyboard-first · Practice at your own pace.
         </span>
       </footer>
       <dialog
@@ -1402,19 +1193,9 @@ export default function App() {
             </dl>
             <div className="detail-skills">
               {(["le", "el"] as const).map((skill) => {
-                const s = snapshot.states.find(
-                  (s) => s.word_id === detail.id && s.skill === skill,
-                );
                 return (
                   <div className="panel" key={skill}>
                     <b>{labels[skill]}</b>
-                    <p>
-                      {mastery(s, now)} · {Math.round(recall(s, now) * 100)}%
-                      recall
-                    </p>
-                    <small>
-                      Next: {s ? date(s.card.due) : "not introduced"}
-                    </small>
                     <button
                       onClick={() =>
                         void start({
@@ -1446,27 +1227,6 @@ export default function App() {
               >
                 Practise principal parts
               </button>
-            )}
-            <h2>Recent attempts</h2>
-            {snapshot.attempts
-              .filter((a) => a.word_id === detail.id)
-              .slice(0, 10)
-              .map((a, i) => (
-                <p className="history" key={i}>
-                  <span>
-                    {labels[a.skill]} · {a.outcome}
-                    <small>
-                      {a.raw || "No answer"}
-                      {a.confusionId !== undefined
-                        ? ` · confused with ${byId.get(a.confusionId)?.latin}`
-                        : ""}
-                    </small>
-                  </span>
-                  <time>{date(a.at)}</time>
-                </p>
-              ))}
-            {!snapshot.attempts.some((a) => a.word_id === detail.id) && (
-              <p className="muted">No attempts yet.</p>
             )}
           </>
         )}

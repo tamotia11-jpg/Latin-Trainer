@@ -2,9 +2,9 @@
 
 A static React/TypeScript/Vite learning application for GitHub Pages. The original vocabulary, reference code and reference design were created by the Latin teacher, not the student. All 450 entries in 15 sections are reproducibly extracted without silent corrections.
 
-Latest scope (1 October 2026): **GitHub Pages only; no authentication, Supabase or server backend.** Progress persists in IndexedDB in this browser. Validated JSON export/import transfers it manually between devices; automatic sync is out of scope. Clearing site data or private browsing can remove progress, so export regular backups.
+Latest scope (2 October 2026): **GitHub Pages only; no authentication, Supabase or server backend.** Progress persists in IndexedDB in this browser. Validated JSON export/import transfers it manually between devices; automatic sync is out of scope. Clearing site data or private browsing can remove progress, so export regular backups.
 
-Implemented: daily review; learn and typed retrieval; independent FSRS cards by direction; principal parts and supported grammar; exams; custom filters; MCQ; flashcards; bounded mistake repeats; confusion tracking; word details; dashboard; keyboard, responsive and dark-mode UX.
+Practice starts immediately with a 10-word Latin-to-English session. Learn, custom practice, exams, MCQ, flashcards, principal parts, supported grammar and vocabulary lookup remain available. The interface has no returning-user dashboard, historical progress stats or resume prompts. Within-session feedback, results and bounded mistake repeats remain. Existing IndexedDB records, independent FSRS cards and JSON backups stay compatible; opening the trainer does not delete saved data.
 
 **Source repository:** [tamotia11-jpg/Latin-Trainer](https://github.com/tamotia11-jpg/Latin-Trainer). GitHub Pages publication uses the included Actions workflow. No backend credentials are needed. Production deployment verification is recorded in the project Page in Atharv Second Brain.
 
