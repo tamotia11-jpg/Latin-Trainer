@@ -1,4 +1,4 @@
-# GCSE Latin Mastery
+# GCSE Latin Trainer
 
 A static React/TypeScript/Vite learning application for GitHub Pages. The original vocabulary, reference code and reference design were created by the Latin teacher, not the student. All 450 entries in 15 sections are reproducibly extracted without silent corrections.
 

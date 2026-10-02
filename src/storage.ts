@@ -242,7 +242,7 @@ export function parseBackup(text: string): Snapshot {
   const b = backupSchema.safeParse(raw);
   if (!b.success)
     throw new Error(
-      "Not a supported Latin Mastery backup, or vocabulary version does not match.",
+      "Not a supported GCSE Latin Trainer backup, or vocabulary version does not match.",
     );
   return validateSnapshot(b.data.snapshot);
 }

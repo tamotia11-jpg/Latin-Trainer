@@ -314,11 +314,11 @@ export default function App() {
         <button
           className="brand"
           onClick={() => navigate("today")}
-          aria-label="Latin Mastery home"
+          aria-label="GCSE Latin Trainer home"
         >
           <span className="brand-mark">L</span>
           <span>
-            Latin <i>Mastery</i>
+            GCSE Latin <i>Trainer</i>
             <small>GCSE vocabulary · 450 words</small>
           </span>
         </button>
@@ -1290,7 +1290,7 @@ function Backup({
       );
       const a = document.createElement("a");
       a.href = url;
-      a.download = `latin-mastery-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `gcse-latin-trainer-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       onNotice("Backup downloaded. Keep it somewhere safe.");

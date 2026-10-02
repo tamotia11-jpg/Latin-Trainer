@@ -3,6 +3,10 @@ test("home and complete vocabulary work at each viewport", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("./");
+  await expect(page).toHaveTitle("GCSE Latin Trainer");
+  await expect(
+    page.getByRole("button", { name: "GCSE Latin Trainer home" }),
+  ).toContainText("GCSE Latin Trainer");
   await expect(
     page.getByRole("heading", { name: "Choose your practice." }),
   ).toBeVisible();
