@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GCSE Latin Vocab Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;1,500&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E8ECEE; --panel:#FFFFFF; --ink:#1B2630; --muted:#5B6873; --line:#C9D1D6;
+  --red:#9E2B1E; --red-soft:#F4E1DD; --ochre:#B7800F; --ochre-soft:#FBF0D6;
+  --green:#236E5E; --green-soft:#DCEFEA; --chip:#F3F5F6;
+  --serif:"Alegreya", Georgia, "Times New Roman", serif;
+  --sans:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141B21; --panel:#1E272F; --ink:#E6EBEE; --muted:#9AA7B1; --line:#34414C;
+    --red:#E0715F; --red-soft:#3A2420; --ochre:#E2B24A; --ochre-soft:#3A3120;
+    --green:#5FC2A8; --green-soft:#1C3530; --chip:#25303A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141B21; --panel:#1E272F; --ink:#E6EBEE; --muted:#9AA7B1; --line:#34414C;
+  --red:#E0715F; --red-soft:#3A2420; --ochre:#E2B24A; --ochre-soft:#3A3120;
+  --green:#5FC2A8; --green-soft:#1C3530; --chip:#25303A;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ochre);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 18px 60px}
+header.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:6px 0 18px;border-bottom:2px solid var(--ink);margin-bottom:22px}
+header.top h1{font-family:var(--serif);font-weight:700;font-size:1.6rem;margin:0;letter-spacing:.02em}
+header.top h1 span{color:var(--red)}
+.linkbtn{background:none;border:0;padding:4px 0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-size:.95rem}
+.hidden{display:none!important}
+h2{font-family:var(--serif);font-size:1.25rem;margin:26px 0 10px}
+p.lead{margin:0 0 6px;color:var(--muted)}
+
+/* setup */
+.sections{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.sec{position:relative;text-align:left;border:2px solid var(--line);background:var(--panel);border-radius:6px;padding:9px 10px 12px;overflow:hidden}
+.sec b{display:block;font-size:1rem}
+.sec small{display:block;color:var(--muted);font-family:var(--serif);font-style:italic;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec .bar{position:absolute;left:0;bottom:0;height:4px;background:var(--green)}
+.sec[aria-pressed="true"]{border-color:var(--red);background:var(--red-soft)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:8px 14px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.small{font-size:.9rem;color:var(--muted)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.mode{border:2px solid var(--ink);background:var(--panel);border-radius:6px;padding:14px 16px;text-align:left}
+.mode b{display:block;font-size:1.05rem}
+.mode span{color:var(--muted);font-size:.93rem}
+.mode.primary{grid-column:1/-1;background:var(--red);border-color:var(--red);color:#fff;padding:18px 18px}
+.mode.primary span{color:#fff;opacity:.9}
+.mode.primary b{font-size:1.3rem}
+.tricky{margin-top:14px}
+.btn{border:2px solid var(--ink);background:var(--panel);border-radius:6px;padding:10px 16px;font-weight:700}
+.btn.go{background:var(--ink);color:var(--bg)}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* quiz */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.95rem;color:var(--muted)}
+.progress{height:6px;background:var(--line);border-radius:3px;margin:8px 0 22px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--red);transition:width .25s}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:28px 22px 24px;text-align:center}
+.prompt{font-family:var(--serif);font-weight:700;font-size:clamp(2.2rem,8vw,3.6rem);line-height:1.1;letter-spacing:.03em;margin:4px 0 8px;overflow-wrap:anywhere}
+.prompt.en{font-weight:500;font-size:clamp(1.6rem,6vw,2.4rem);letter-spacing:0}
+.gram{color:var(--muted);font-family:var(--serif);font-style:italic;font-size:1.05rem;min-height:1.5em}
+.ask{margin:6px 0 0;color:var(--muted);font-size:.95rem}
+.answer{display:flex;gap:8px;margin-top:22px}
+.answer input{flex:1;min-width:0;border:2px solid var(--ink);border-radius:6px;padding:12px 14px;font-size:1.15rem;background:var(--bg)}
+.answer input.ok{border-color:var(--green)}.answer input.bad{border-color:var(--red)}.answer input.near{border-color:var(--ochre)}
+.subrow{display:flex;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap}
+.hintline{font-family:var(--serif);font-size:1.1rem;color:var(--ochre);min-height:1.5em;margin-top:8px}
+.fb{margin-top:18px;border-radius:6px;padding:14px 16px;text-align:left}
+.fb.ok{background:var(--green-soft);border-left:6px solid var(--green)}
+.fb.bad{background:var(--red-soft);border-left:6px solid var(--red)}
+.fb.near{background:var(--ochre-soft);border-left:6px solid var(--ochre)}
+.fb h3{margin:0 0 6px;font-size:1.05rem}
+.entry{font-family:var(--serif);font-size:1.1rem}
+.entry .lw{font-weight:700}
+.entry .pp{font-style:italic;color:var(--muted)}
+.fb .you{font-size:.92rem;color:var(--muted);margin-top:4px}
+.fbrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.opts{display:grid;grid-template-columns:1fr;gap:9px;margin-top:22px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;border:2px solid var(--line);background:var(--bg);border-radius:6px;padding:12px 14px;font-size:1.05rem}
+.opt kbd{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:4px;background:var(--panel);border:1px solid var(--line);font-family:var(--sans);font-size:.85rem}
+.opt.latin{font-family:var(--serif);font-size:1.2rem;font-weight:700}
+.opt.right{border-color:var(--green);background:var(--green-soft)}
+.opt.wrong{border-color:var(--red);background:var(--red-soft)}
+@media (min-width:560px){.opts{grid-template-columns:1fr 1fr}}
+
+/* flashcards */
+.flip{cursor:pointer;min-height:260px;display:flex;flex-direction:column;justify-content:center}
+.flip .back{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.flip .back .mean{font-size:1.5rem;font-weight:700}
+.tap{color:var(--muted);font-size:.9rem;margin-top:14px}
+
+/* results + list */
+.score{font-family:var(--serif);font-size:3.4rem;font-weight:700;line-height:1;margin:6px 0}
+.misslist{list-style:none;padding:0;margin:10px 0 0}
+.misslist li{padding:10px 0;border-bottom:1px solid var(--line)}
+.tablewrap{overflow-x:auto;margin-top:10px;background:var(--panel);border:2px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:.97rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.85rem;color:var(--muted);font-weight:700}
+td.lw{font-family:var(--serif);font-weight:700;font-size:1.08rem;white-space:nowrap}
+td.pp{font-family:var(--serif);font-style:italic;color:var(--muted)}
+td.st{white-space:nowrap}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dot.g{background:var(--green)}.dot.r{background:var(--red)}.dot.o{background:var(--ochre)}
+.hide-en td.mn span{filter:blur(6px);cursor:pointer}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.88rem;color:var(--muted);margin-top:8px}
+@media (max-width:520px){.modes{grid-template-columns:1fr}td.pp{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>Latin vocab <span>trainer</span></h1>
+  <button class="linkbtn hidden" id="homeBtn">Back to menu</button>
+</header>
+
+<!-- SETUP -->
+<main id="setup">
+  <p class="lead">GCSE defined vocabulary list: 450 words in 15 sections. Pick your sections, then learn or test yourself.</p>
+
+  <h2>1. Choose sections</h2>
+  <div class="sections" id="secGrid"></div>
+  <div class="row">
+    <button class="btn" id="selAll">Select all</button>
+    <button class="btn" id="selNone">Clear</button>
+    <span class="small" id="selInfo"></span>
+  </div>
+
+  <h2>2. Settings</h2>
+  <div class="row">
+    <div class="seg" role="group" aria-label="Direction">
+      <button data-dir="le" aria-pressed="true">Latin → English</button>
+      <button data-dir="el" aria-pressed="false">English → Latin</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="seg" role="group" aria-label="Number of questions">
+      <button data-count="10" aria-pressed="false">10</button>
+      <button data-count="20" aria-pressed="true">20</button>
+      <button data-count="30" aria-pressed="false">30</button>
+      <button data-count="0" aria-pressed="false">All</button>
+    </div>
+    <div class="seg" role="group" aria-label="Order">
+      <button data-order="smart" aria-pressed="true">Focus on weak words</button>
+      <button data-order="weak" aria-pressed="false">Weakest first</button>
+      <button data-order="random" aria-pressed="false">Plain random</button>
+    </div>
+  </div>
+
+  <p class="small" id="orderNote"></p>
+
+  <h2>3. Go</h2>
+  <div class="modes">
+    <button class="mode primary" data-mode="type"><b>Type-in test</b><span>Write the meaning yourself. The best way to prepare for the exam.</span></button>
+    <button class="mode" data-mode="mc"><b>Multiple choice</b><span>Pick from four options. Good for a quick warm-up.</span></button>
+    <button class="mode" data-mode="flash"><b>Flashcards</b><span>Flip through the words to learn them first.</span></button>
+    <button class="mode" data-mode="list" style="grid-column:1/-1"><b>Word list</b><span>See the whole section, with your progress on each word. You can hide the meanings to test yourself.</span></button>
+  </div>
+  <div class="tricky row">
+    <button class="btn go" id="trickyBtn">Type-test my tricky words</button>
+    <span class="small" id="trickyInfo"></span>
+  </div>
+  <p class="small" style="margin-top:28px">Progress is saved in this browser. Green bar on each section = words you've got right twice in a row in a test. <button class="linkbtn" id="resetBtn">Reset my progress</button></p>
+</main>
+
+<!-- QUIZ (type + mc) -->
+<main id="quiz" class="hidden">
+  <div class="qhead"><span id="qCount"></span><span id="qScore"></span></div>
+  <div class="progress"><i id="qBar"></i></div>
+  <div class="card">
+    <div class="prompt" id="qPrompt"></div>
+    <div class="gram" id="qGram"></div>
+    <p class="ask" id="qAsk"></p>
+
+    <div id="typeArea">
+      <form class="answer" id="typeForm" autocomplete="off" onsubmit="return false">
+        <input id="typeIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Your answer">
+        <button class="btn go" id="checkBtn" type="submit">Check</button>
+      </form>
+      <div class="hintline" id="hintLine"></div>
+      <div class="subrow">
+        <button class="linkbtn" id="hintBtn" type="button">Hint: show first letter</button>
+        <button class="linkbtn" id="skipBtn" type="button">I don't know</button>
+      </div>
+    </div>
+
+    <div id="mcArea" class="opts"></div>
+    <div id="fb"></div>
+  </div>
+</main>
+
+<!-- FLASHCARDS -->
+<main id="flash" class="hidden">
+  <div class="qhead"><span id="fCount"></span><span id="fLeft"></span></div>
+  <div class="progress"><i id="fBar"></i></div>
+  <div class="card flip" id="fCard" tabindex="0" role="button" aria-label="Flip card">
+    <div class="prompt" id="fFront"></div>
+    <div class="gram" id="fGram"></div>
+    <div class="back hidden" id="fBack"></div>
+    <div class="tap" id="fTap">Tap the card or press Space to flip</div>
+  </div>
+  <div class="row" style="justify-content:center;margin-top:14px">
+    <button class="btn" id="fNo">Not yet (1)</button>
+    <button class="btn go" id="fYes">Got it (2)</button>
+  </div>
+  <p class="small" style="text-align:center">"Not yet" cards come back a few cards later, and will come up more often in your tests too.</p>
+</main>
+
+<!-- RESULTS -->
+<main id="results" class="hidden">
+  <div class="card" style="text-align:left">
+    <div class="small" id="rMode"></div>
+    <div class="score" id="rScore"></div>
+    <div id="rMsg"></div>
+    <div class="fbrow">
+      <button class="btn go" id="rRetry">Retest the ones I missed</button>
+      <button class="btn" id="rAgain">New test, same settings</button>
+      <button class="btn" id="rHome">Back to menu</button>
+    </div>
+  </div>
+  <h2 id="rMissH">Words to look at again</h2>
+  <ul class="misslist" id="rMiss"></ul>
+</main>
+
+<!-- LIST -->
+<main id="list" class="hidden">
+  <div class="row" style="justify-content:space-between">
+    <span id="lInfo" class="small"></span>
+    <button class="btn" id="lHide">Hide meanings</button>
+  </div>
+  <div class="legend"><span><i class="dot g"></i> learnt (right twice running)</span><span><i class="dot o"></i> getting there</span><span><i class="dot r"></i> last answer wrong</span><span><i class="dot"></i> not tested yet</span></div>
+  <div class="tablewrap" id="lWrap"><table><thead><tr><th></th><th>Latin</th><th>Forms</th><th>Type</th><th>Meaning</th></tr></thead><tbody id="lBody"></tbody></table></div>
+</main>
+</div>
+
+<script>
+const V = [{"i":0,"s":1,"l":"a, ab","p":"+ ablative (also used as prefix with verbs)","t":"preposition","e":"from, away from, by (as prefix = away)"},{"i":1,"s":1,"l":"absum","p":"abesse, afui","t":"verb irregular","e":"be absent, be away, be distant from"},{"i":2,"s":1,"l":"ac, atque","p":"","t":"conjunction","e":"and"},{"i":3,"s":1,"l":"accido","p":"accidere, accidi","t":"verb 3","e":"happen"},{"i":4,"s":1,"l":"accipio","p":"accipere, accepi, acceptus","t":"verb 3","e":"accept, take in, receive"},{"i":5,"s":1,"l":"ad","p":"+ accusative (also used as prefix with verbs)","t":"preposition","e":"to, towards, at"},{"i":6,"s":1,"l":"adeo","p":"","t":"adverb","e":"so much, so greatly, to such an extent"},{"i":7,"s":1,"l":"adsum","p":"adesse, adfui","t":"verb irregular","e":"be here, be present"},{"i":8,"s":1,"l":"advenio","p":"advenire, adveni","t":"verb 4","e":"arrive"},{"i":9,"s":1,"l":"aedifico","p":"aedificare, aedificavi, aedificatus","t":"verb 1","e":"build"},{"i":10,"s":1,"l":"ager","p":"agri, m","t":"noun 2","e":"field"},{"i":11,"s":1,"l":"ago","p":"agere, egi, actus","t":"verb 3","e":"do, act, drive"},{"i":12,"s":1,"l":"alii ... alii","p":"","t":"","e":"some ... others"},{"i":13,"s":1,"l":"alius","p":"alia, aliud","t":"pronoun/adjective","e":"other, another, else"},{"i":14,"s":1,"l":"alter","p":"altera, alterum","t":"pronoun/adjective","e":"the other, another, one (of two), the second (of two)"},{"i":15,"s":1,"l":"altus","p":"alta, altum","t":"adjective","e":"high, deep"},{"i":16,"s":1,"l":"ambulo","p":"ambulare, ambulavi","t":"verb 1","e":"walk"},{"i":17,"s":1,"l":"amicus","p":"amici, m","t":"noun 2","e":"friend"},{"i":18,"s":1,"l":"amo","p":"amare, amavi, amatus","t":"verb 1","e":"love, like"},{"i":19,"s":1,"l":"amor","p":"amoris, m","t":"noun 3","e":"love"},{"i":20,"s":1,"l":"ancilla","p":"ancillae, f","t":"noun 1","e":"slave-girl, slave-woman"},{"i":21,"s":1,"l":"animus","p":"animi, m","t":"noun 2","e":"spirit, soul, mind"},{"i":22,"s":1,"l":"annus","p":"anni, m","t":"noun 2","e":"year"},{"i":23,"s":1,"l":"antea","p":"","t":"adverb","e":"before"},{"i":24,"s":1,"l":"appropinquo","p":"appropinquare, appropinquavi + dative","t":"verb 1","e":"approach, come near to"},{"i":25,"s":1,"l":"aqua","p":"aquae, f","t":"noun 1","e":"water"},{"i":26,"s":1,"l":"arma","p":"armorum, n plural","t":"noun 2 plural","e":"arms, weapons"},{"i":27,"s":1,"l":"ars","p":"artis, f","t":"noun 3","e":"art, skill"},{"i":28,"s":1,"l":"ascendo","p":"ascendere, ascendi, ascensus","t":"verb 3","e":"climb"},{"i":29,"s":1,"l":"audax","p":"audacis","t":"adjective","e":"bold, daring"},{"i":30,"s":2,"l":"audeo","p":"audere, ausus sum","t":"verb 2","e":"dare"},{"i":31,"s":2,"l":"audio","p":"audire, audivi, auditus","t":"verb 4","e":"hear, listen to"},{"i":32,"s":2,"l":"aufero","p":"auferre, abstuli, ablatus","t":"verb irregular","e":"take away, carry off, steal"},{"i":33,"s":2,"l":"auxilium","p":"auxilii, n","t":"noun 2","e":"help"},{"i":34,"s":2,"l":"bellum","p":"belli, n","t":"noun 2","e":"war"},{"i":35,"s":2,"l":"bene","p":"","t":"adverb","e":"well"},{"i":36,"s":2,"l":"bibo","p":"bibere, bibi","t":"verb 3","e":"drink"},{"i":37,"s":2,"l":"bonus","p":"bona, bonum","t":"adjective","e":"good"},{"i":38,"s":2,"l":"brevis","p":"breve","t":"adjective","e":"short, brief"},{"i":39,"s":2,"l":"cado","p":"cadere, cecidi, casus","t":"verb 3","e":"fall"},{"i":40,"s":2,"l":"caelum","p":"caeli, n","t":"noun 2","e":"sky, heaven"},{"i":41,"s":2,"l":"capio","p":"capere, cepi, captus","t":"verb 3","e":"take, catch, capture, make (a plan)"},{"i":42,"s":2,"l":"captivus","p":"captivi, m","t":"noun 2","e":"captive, prisoner"},{"i":43,"s":2,"l":"caput","p":"capitis, n","t":"noun 3","e":"head"},{"i":44,"s":2,"l":"castra","p":"castrorum, n plural","t":"noun 2","e":"camp"},{"i":45,"s":2,"l":"celer","p":"celeris, celere","t":"adjective","e":"quick, fast"},{"i":46,"s":2,"l":"celo","p":"celare, celavi, celatus","t":"verb 1","e":"hide"},{"i":47,"s":2,"l":"cena","p":"cenae, f","t":"noun 1","e":"dinner, meal"},{"i":48,"s":2,"l":"ceteri","p":"ceterae, cetera","t":"adjective","e":"the rest, the others"},{"i":49,"s":2,"l":"cibus","p":"cibi, m","t":"noun 2","e":"food"},{"i":50,"s":2,"l":"circum","p":"+ accusative","t":"preposition","e":"around"},{"i":51,"s":2,"l":"civis","p":"civis, m and f","t":"noun 3","e":"citizen"},{"i":52,"s":2,"l":"clamo","p":"clamare, clamavi, clamatus","t":"verb 1","e":"shout"},{"i":53,"s":2,"l":"clamor","p":"clamoris, m","t":"noun 3","e":"shout, shouting, noise"},{"i":54,"s":2,"l":"clarus","p":"clara, clarum","t":"adjective","e":"famous, clear"},{"i":55,"s":2,"l":"coepi","p":"coepisse","t":"verb irregular","e":"began"},{"i":56,"s":2,"l":"cogito","p":"cogitare, cogitavi, cogitatus","t":"verb 1","e":"think, consider"},{"i":57,"s":2,"l":"cognosco","p":"cognoscere, cognovi, cognitus","t":"verb 3","e":"get to know, find out"},{"i":58,"s":2,"l":"cogo","p":"cogere, coegi, coactus","t":"verb 3","e":"force, compel"},{"i":59,"s":2,"l":"comes","p":"comitis, m and f","t":"noun 3","e":"comrade, companion"},{"i":60,"s":2,"l":"conficio","p":"conficere, confeci, confectus","t":"verb 3","e":"finish, wear out"},{"i":61,"s":3,"l":"conor","p":"conari, conatus sum","t":"verb 1 deponent","e":"try"},{"i":62,"s":3,"l":"consilium","p":"consilii, n","t":"noun 2","e":"plan, idea, advice"},{"i":63,"s":3,"l":"conspicio","p":"conspicere, conspexi, conspectus","t":"verb 3","e":"catch sight of, notice"},{"i":64,"s":3,"l":"constituo","p":"constituere, constitui, constitutus","t":"verb 3","e":"decide"},{"i":65,"s":3,"l":"consul","p":"consulis, m","t":"noun 3","e":"consul"},{"i":66,"s":3,"l":"consumo","p":"consumere, consumpsi, consumptus","t":"verb 3","e":"eat"},{"i":67,"s":3,"l":"contra","p":"+ accusative","t":"preposition","e":"against"},{"i":68,"s":3,"l":"convenio","p":"convenire, conveni","t":"verb 4","e":"come together, gather, meet"},{"i":69,"s":3,"l":"copiae","p":"copiarum, f plural","t":"noun 1 plural","e":"forces, troops"},{"i":70,"s":3,"l":"corpus","p":"corporis, n","t":"noun 3","e":"body"},{"i":71,"s":3,"l":"cras","p":"","t":"adverb","e":"tomorrow"},{"i":72,"s":3,"l":"credo","p":"credere, credidi, creditus + dative","t":"verb 3","e":"believe, trust"},{"i":73,"s":3,"l":"crudelis","p":"crudele","t":"adjective","e":"cruel"},{"i":74,"s":3,"l":"cum","p":"+ ablative","t":"preposition","e":"with"},{"i":75,"s":3,"l":"cum","p":"","t":"conjunction","e":"when, since"},{"i":76,"s":3,"l":"cupio","p":"cupere, cupivi, cupitus","t":"verb 3","e":"want, desire"},{"i":77,"s":3,"l":"cur?","p":"","t":"adverb","e":"why?"},{"i":78,"s":3,"l":"cura","p":"curae, f","t":"noun 1","e":"care, worry"},{"i":79,"s":3,"l":"curro","p":"currere, cucurri, cursus","t":"verb 3","e":"run"},{"i":80,"s":3,"l":"custodio","p":"custodire, custodivi, custoditus","t":"verb 4","e":"guard"},{"i":81,"s":3,"l":"custos","p":"custodis, m and f","t":"noun 3","e":"guard"},{"i":82,"s":3,"l":"de","p":"+ ablative","t":"preposition","e":"from, down from, about"},{"i":83,"s":3,"l":"dea","p":"deae, f","t":"noun 1","e":"goddess"},{"i":84,"s":3,"l":"debeo","p":"debere, debui, debitus","t":"verb 2","e":"owe, ought, should, must"},{"i":85,"s":3,"l":"defendo","p":"defendere, defendi, defensus","t":"verb 3","e":"defend"},{"i":86,"s":3,"l":"deinde","p":"","t":"adverb","e":"then"},{"i":87,"s":3,"l":"deleo","p":"delere, delevi, deletus","t":"verb 2","e":"destroy"},{"i":88,"s":3,"l":"descendo","p":"descendere, descendi, descensus","t":"verb 3","e":"go down, come down"},{"i":89,"s":3,"l":"deus","p":"dei, m","t":"noun 2","e":"god"},{"i":90,"s":3,"l":"dico","p":"dicere, dixi, dictus","t":"verb 3","e":"say, speak, tell"},{"i":91,"s":4,"l":"dies","p":"diei, m","t":"noun 5","e":"day"},{"i":92,"s":4,"l":"difficilis","p":"difficile","t":"adjective","e":"difficult"},{"i":93,"s":4,"l":"diligens","p":"diligentis","t":"adjective","e":"careful"},{"i":94,"s":4,"l":"dirus","p":"dira, dirum","t":"adjective","e":"dreadful"},{"i":95,"s":4,"l":"discedo","p":"discedere, discessi","t":"verb 3","e":"depart, leave"},{"i":96,"s":4,"l":"diu","p":"","t":"adverb","e":"for a long time"},{"i":97,"s":4,"l":"do","p":"dare, dedi, datus","t":"verb 1","e":"give"},{"i":98,"s":4,"l":"doceo","p":"docere, docui, doctus","t":"verb 2","e":"teach"},{"i":99,"s":4,"l":"domina","p":"dominae, f","t":"noun 1","e":"mistress"},{"i":100,"s":4,"l":"dominus","p":"domini, m","t":"noun 2","e":"master"},{"i":101,"s":4,"l":"domus","p":"domus, f (domi = at home)","t":"noun 4","e":"home"},{"i":102,"s":4,"l":"donum","p":"doni, n","t":"noun 2","e":"gift, present"},{"i":103,"s":4,"l":"dormio","p":"dormire, dormivi","t":"verb 4","e":"sleep"},{"i":104,"s":4,"l":"duco","p":"ducere, duxi, ductus","t":"verb 3","e":"lead, take"},{"i":105,"s":4,"l":"dum","p":"","t":"conjunction","e":"while, until"},{"i":106,"s":4,"l":"dux","p":"ducis, m","t":"noun 3","e":"leader"},{"i":107,"s":4,"l":"e, ex","p":"+ ablative (also used as prefix with verbs)","t":"preposition","e":"from, out of, out"},{"i":108,"s":4,"l":"ecce!","p":"","t":"adverb","e":"look!"},{"i":109,"s":4,"l":"effugio","p":"effugere, effugi","t":"verb 3","e":"escape"},{"i":110,"s":4,"l":"ego","p":"mei","t":"pronoun","e":"I, me"},{"i":111,"s":4,"l":"egredior","p":"egredi, egressus sum","t":"verb 3 deponent","e":"go out"},{"i":112,"s":4,"l":"emo","p":"emere, emi, emptus","t":"verb 3","e":"buy"},{"i":113,"s":4,"l":"enim","p":"","t":"conjunction","e":"for"},{"i":114,"s":4,"l":"eo","p":"ire, i(v)i","t":"verb irregular","e":"go"},{"i":115,"s":4,"l":"epistula","p":"epistulae, f","t":"noun 1","e":"letter"},{"i":116,"s":4,"l":"equus","p":"equi, m","t":"noun 2","e":"horse"},{"i":117,"s":4,"l":"et","p":"","t":"conjunction","e":"and, even"},{"i":118,"s":4,"l":"et ... et","p":"","t":"","e":"both ... and"},{"i":119,"s":4,"l":"etiam","p":"","t":"adverb","e":"also, even"},{"i":120,"s":4,"l":"exercitus","p":"exercitus, m","t":"noun 4","e":"army"},{"i":121,"s":5,"l":"exspecto","p":"exspectare, exspectavi, exspectatus","t":"verb 1","e":"wait for, expect"},{"i":122,"s":5,"l":"facilis","p":"facile","t":"adjective","e":"easy"},{"i":123,"s":5,"l":"facio","p":"facere, feci, factus","t":"verb 3","e":"make, do"},{"i":124,"s":5,"l":"faveo","p":"favere, favi, fautus + dative","t":"verb 2","e":"favour, support"},{"i":125,"s":5,"l":"felix","p":"felicis","t":"adjective","e":"fortunate, happy"},{"i":126,"s":5,"l":"femina","p":"feminae, f","t":"noun 1","e":"woman"},{"i":127,"s":5,"l":"fero","p":"ferre, tuli, latus","t":"verb irregular","e":"bring, carry, bear"},{"i":128,"s":5,"l":"ferox","p":"ferocis","t":"adjective","e":"fierce, ferocious"},{"i":129,"s":5,"l":"festino","p":"festinare, festinavi","t":"verb 1","e":"hurry"},{"i":130,"s":5,"l":"fidelis","p":"fidele","t":"adjective","e":"faithful, loyal"},{"i":131,"s":5,"l":"filia","p":"filiae, f","t":"noun 1","e":"daughter"},{"i":132,"s":5,"l":"filius","p":"filii, m","t":"noun 2","e":"son"},{"i":133,"s":5,"l":"flumen","p":"fluminis, n","t":"noun 3","e":"river"},{"i":134,"s":5,"l":"forte","p":"","t":"adverb","e":"by chance"},{"i":135,"s":5,"l":"fortis","p":"forte","t":"adjective","e":"brave"},{"i":136,"s":5,"l":"forum","p":"fori, n","t":"noun 2","e":"forum, market place"},{"i":137,"s":5,"l":"frater","p":"fratris, m","t":"noun 3","e":"brother"},{"i":138,"s":5,"l":"frustra","p":"","t":"adverb","e":"in vain"},{"i":139,"s":5,"l":"fugio","p":"fugere, fugi","t":"verb 3","e":"run away, flee"},{"i":140,"s":5,"l":"gaudeo","p":"gaudere, gavisus sum","t":"verb 2","e":"be pleased, rejoice"},{"i":141,"s":5,"l":"gaudium","p":"gaudii, n","t":"noun 2","e":"joy, pleasure"},{"i":142,"s":5,"l":"gens","p":"gentis, f","t":"noun 3","e":"family, tribe, race, people"},{"i":143,"s":5,"l":"gero","p":"gerere, gessi, gestus","t":"verb 3","e":"wear (clothes), wage (war)"},{"i":144,"s":5,"l":"gladius","p":"gladii, m","t":"noun 2","e":"sword"},{"i":145,"s":5,"l":"gravis","p":"grave","t":"adjective","e":"heavy, serious"},{"i":146,"s":5,"l":"habeo","p":"habere, habui, habitus","t":"verb 2","e":"have, hold"},{"i":147,"s":5,"l":"habito","p":"habitare, habitavi, habitatus","t":"verb 1","e":"live"},{"i":148,"s":5,"l":"heri","p":"","t":"adverb","e":"yesterday"},{"i":149,"s":5,"l":"hic","p":"haec, hoc","t":"pronoun","e":"this, he, she, it"},{"i":150,"s":6,"l":"hodie","p":"","t":"adverb","e":"today"},{"i":151,"s":6,"l":"homo","p":"hominis, m","t":"noun 3","e":"man, human being"},{"i":152,"s":6,"l":"hora","p":"horae, f","t":"noun 1","e":"hour"},{"i":153,"s":6,"l":"hortor","p":"hortari, hortatus sum","t":"verb 1 deponent","e":"encourage, urge"},{"i":154,"s":6,"l":"hortus","p":"horti, m","t":"noun 2","e":"garden"},{"i":155,"s":6,"l":"hostis","p":"hostis, m","t":"noun 3","e":"enemy"},{"i":156,"s":6,"l":"iaceo","p":"iacere, iacui","t":"verb 2","e":"lie"},{"i":157,"s":6,"l":"iacio","p":"iacere, ieci, iactus (in compounds -icio)","t":"verb 3","e":"throw"},{"i":158,"s":6,"l":"iam","p":"","t":"adverb","e":"now, already"},{"i":159,"s":6,"l":"ianua","p":"ianuae, f","t":"noun 1","e":"door"},{"i":160,"s":6,"l":"ibi","p":"","t":"adverb","e":"there"},{"i":161,"s":6,"l":"idem","p":"eadem, idem","t":"pronoun","e":"the same"},{"i":162,"s":6,"l":"igitur","p":"","t":"adverb","e":"therefore, and so"},{"i":163,"s":6,"l":"ille","p":"illa, illud","t":"pronoun","e":"that, he, she, it"},{"i":164,"s":6,"l":"imperator","p":"imperatoris, m","t":"noun 3","e":"emperor, general, leader"},{"i":165,"s":6,"l":"imperium","p":"imperii, n","t":"noun 2","e":"empire, power, command"},{"i":166,"s":6,"l":"impero","p":"imperare, imperavi, imperatus + dative","t":"verb 1","e":"order, command"},{"i":167,"s":6,"l":"in","p":"+ ablative (also used as prefix with verbs)","t":"preposition","e":"in, on"},{"i":168,"s":6,"l":"in","p":"+ accusative (also used as prefix with verbs)","t":"preposition","e":"into, onto"},{"i":169,"s":6,"l":"incendo","p":"incendere, incendi, incensus","t":"verb 3","e":"burn, set on fire"},{"i":170,"s":6,"l":"infelix","p":"infelicis","t":"adjective","e":"unlucky, unhappy"},{"i":171,"s":6,"l":"ingens","p":"ingentis","t":"adjective","e":"huge"},{"i":172,"s":6,"l":"ingredior","p":"ingredi, ingressus sum","t":"verb 3 deponent","e":"enter"},{"i":173,"s":6,"l":"inimicus","p":"inimici, m","t":"noun 2","e":"enemy"},{"i":174,"s":6,"l":"inquit","p":"","t":"verb irregular","e":"he/she says, he/she said"},{"i":175,"s":6,"l":"insula","p":"insulae, f","t":"noun 1","e":"island, block of flats"},{"i":176,"s":6,"l":"intellego","p":"intellegere, intellexi, intellectus","t":"verb 3","e":"understand, realise"},{"i":177,"s":6,"l":"inter","p":"+ accusative","t":"preposition","e":"among, between"},{"i":178,"s":6,"l":"interea","p":"","t":"adverb","e":"meanwhile"},{"i":179,"s":6,"l":"interficio","p":"interficere, interfeci, interfectus","t":"verb 3","e":"kill"},{"i":180,"s":6,"l":"intro","p":"intrare, intravi, intratus","t":"verb 1","e":"enter"},{"i":181,"s":7,"l":"invenio","p":"invenire, inveni, inventus","t":"verb 4","e":"find"},{"i":182,"s":7,"l":"invito","p":"invitare, invitavi, invitatus","t":"verb 1","e":"invite"},{"i":183,"s":7,"l":"ipse","p":"ipsa, ipsum","t":"pronoun","e":"himself, herself, itself, themselves"},{"i":184,"s":7,"l":"ira","p":"irae, f","t":"noun 1","e":"anger"},{"i":185,"s":7,"l":"iratus","p":"irata, iratum","t":"adjective","e":"angry"},{"i":186,"s":7,"l":"is","p":"ea, id","t":"pronoun","e":"this, that, he, she, it, them"},{"i":187,"s":7,"l":"ita","p":"","t":"adverb","e":"in this way, to such an extent, so"},{"i":188,"s":7,"l":"itaque","p":"","t":"adverb","e":"and so, therefore"},{"i":189,"s":7,"l":"iter","p":"itineris, n","t":"noun 3","e":"journey"},{"i":190,"s":7,"l":"iterum","p":"","t":"adverb","e":"again"},{"i":191,"s":7,"l":"iubeo","p":"iubere, iussi, iussus","t":"verb 2","e":"order"},{"i":192,"s":7,"l":"iuvenis","p":"iuvenis, m","t":"noun 3","e":"young man"},{"i":193,"s":7,"l":"labor","p":"laboris, m","t":"noun 3","e":"work, toil"},{"i":194,"s":7,"l":"laboro","p":"laborare, laboravi","t":"verb 1","e":"work, toil"},{"i":195,"s":7,"l":"lacrimo","p":"lacrimare, lacrimavi","t":"verb 1","e":"weep, cry"},{"i":196,"s":7,"l":"laetus","p":"laeta, laetum","t":"adjective","e":"happy"},{"i":197,"s":7,"l":"laudo","p":"laudare, laudavi, laudatus","t":"verb 1","e":"praise"},{"i":198,"s":7,"l":"legio","p":"legionis, f","t":"noun 3","e":"legion"},{"i":199,"s":7,"l":"lego","p":"legere, legi, lectus","t":"verb 3","e":"read, choose"},{"i":200,"s":7,"l":"lentus","p":"lenta, lentum","t":"adjective","e":"slow"},{"i":201,"s":7,"l":"libenter","p":"","t":"adverb","e":"willingly, gladly"},{"i":202,"s":7,"l":"liber","p":"libri, m","t":"noun 2","e":"book"},{"i":203,"s":7,"l":"liberi","p":"liberorum, m plural","t":"noun 2","e":"children"},{"i":204,"s":7,"l":"libero","p":"liberare, liberavi, liberatus","t":"verb 1","e":"set free"},{"i":205,"s":7,"l":"libertus","p":"liberti, m","t":"noun 2","e":"freedman, ex-slave"},{"i":206,"s":7,"l":"locus","p":"loci, m","t":"noun 2","e":"place"},{"i":207,"s":7,"l":"longus","p":"longa, longum","t":"adjective","e":"long"},{"i":208,"s":7,"l":"loquor","p":"loqui, locutus sum","t":"verb 3 deponent","e":"speak, talk"},{"i":209,"s":7,"l":"lux","p":"lucis, f","t":"noun 3","e":"light, daylight"},{"i":210,"s":7,"l":"magnus","p":"magna, magnum","t":"adjective","e":"big, large, great"},{"i":211,"s":8,"l":"malo","p":"malle, malui","t":"verb irregular","e":"prefer"},{"i":212,"s":8,"l":"malus","p":"mala, malum","t":"adjective","e":"evil, bad"},{"i":213,"s":8,"l":"maneo","p":"manere, mansi","t":"verb 2","e":"remain, stay"},{"i":214,"s":8,"l":"manus","p":"manus, f","t":"noun 4","e":"hand, group of people"},{"i":215,"s":8,"l":"mare","p":"maris, n","t":"noun 3","e":"sea"},{"i":216,"s":8,"l":"maritus","p":"mariti, m","t":"noun 2","e":"husband"},{"i":217,"s":8,"l":"mater","p":"matris, f","t":"noun 3","e":"mother"},{"i":218,"s":8,"l":"maxime","p":"","t":"adverb","e":"very greatly"},{"i":219,"s":8,"l":"medius","p":"media, medium","t":"adjective","e":"middle"},{"i":220,"s":8,"l":"meus","p":"mea, meum","t":"pronoun","e":"my"},{"i":221,"s":8,"l":"miles","p":"militis, m","t":"noun 3","e":"soldier"},{"i":222,"s":8,"l":"minime","p":"","t":"adverb","e":"very little, least, no"},{"i":223,"s":8,"l":"miror","p":"mirari, miratus sum","t":"verb 1 deponent","e":"wonder at, admire"},{"i":224,"s":8,"l":"miser","p":"misera, miserum","t":"adjective","e":"miserable, wretched, sad"},{"i":225,"s":8,"l":"mitto","p":"mittere, misi, missus","t":"verb 3","e":"send"},{"i":226,"s":8,"l":"modus","p":"modi, m","t":"noun 2","e":"manner, way, kind"},{"i":227,"s":8,"l":"moneo","p":"monere, monui, monitus","t":"verb 2","e":"warn, advise"},{"i":228,"s":8,"l":"mons","p":"montis, m","t":"noun 3","e":"mountain"},{"i":229,"s":8,"l":"morior","p":"mori, mortuus sum","t":"verb 3 deponent","e":"die"},{"i":230,"s":8,"l":"mors","p":"mortis, f","t":"noun 3","e":"death"},{"i":231,"s":8,"l":"moveo","p":"movere, movi, motus","t":"verb 2","e":"move"},{"i":232,"s":8,"l":"mox","p":"","t":"adverb","e":"soon"},{"i":233,"s":8,"l":"multo","p":"","t":"adverb","e":"much"},{"i":234,"s":8,"l":"multus","p":"multa, multum","t":"adjective","e":"much, many"},{"i":235,"s":8,"l":"murus","p":"muri, m","t":"noun 2","e":"wall"},{"i":236,"s":8,"l":"nam","p":"","t":"conjunction","e":"for"},{"i":237,"s":8,"l":"narro","p":"narrare, narravi, narratus","t":"verb 1","e":"tell, relate"},{"i":238,"s":8,"l":"nauta","p":"nautae, m","t":"noun 1","e":"sailor"},{"i":239,"s":8,"l":"navigo","p":"navigare, navigavi","t":"verb 1","e":"sail"},{"i":240,"s":8,"l":"navis","p":"navis, f","t":"noun 3","e":"ship"},{"i":241,"s":9,"l":"-ne","p":"","t":"particle","e":"(introduces question)"},{"i":242,"s":9,"l":"ne","p":"indeclinable + subjunctive","t":"conjunction","e":"that ... not, so that ... not, that, lest"},{"i":243,"s":9,"l":"nec, neque","p":"","t":"conjunction","e":"and not, nor, neither"},{"i":244,"s":9,"l":"neco","p":"necare, necavi, necatus","t":"verb 1","e":"kill"},{"i":245,"s":9,"l":"nemo","p":"nullius","t":"noun irregular","e":"no one, nobody"},{"i":246,"s":9,"l":"nescio","p":"nescire, nescivi","t":"verb 4","e":"not know"},{"i":247,"s":9,"l":"nihil","p":"","t":"noun irregular","e":"nothing"},{"i":248,"s":9,"l":"nisi","p":"","t":"conjunction","e":"unless, except"},{"i":249,"s":9,"l":"nolo","p":"nolle, nolui","t":"verb irregular","e":"not want, refuse"},{"i":250,"s":9,"l":"nomen","p":"nominis, n","t":"noun 3","e":"name"},{"i":251,"s":9,"l":"non","p":"","t":"adverb","e":"not"},{"i":252,"s":9,"l":"nonne ...?","p":"","t":"adverb","e":"surely ... ?"},{"i":253,"s":9,"l":"nonnulli","p":"nonnullae, nonnulla","t":"adjective","e":"some, several"},{"i":254,"s":9,"l":"nos","p":"nostrum","t":"pronoun","e":"we, us"},{"i":255,"s":9,"l":"noster","p":"nostra, nostrum","t":"pronoun","e":"our"},{"i":256,"s":9,"l":"novus","p":"nova, novum","t":"adjective","e":"new"},{"i":257,"s":9,"l":"nox","p":"noctis, f","t":"noun 3","e":"night"},{"i":258,"s":9,"l":"nullus","p":"nulla, nullum","t":"adjective","e":"not any, no"},{"i":259,"s":9,"l":"num","p":"","t":"particle","e":"whether"},{"i":260,"s":9,"l":"num ... ?","p":"","t":"particle","e":"surely ... not?"},{"i":261,"s":9,"l":"numquam","p":"","t":"adverb","e":"never"},{"i":262,"s":9,"l":"nunc","p":"","t":"adverb","e":"now"},{"i":263,"s":9,"l":"nuntio","p":"nuntiare, nuntiavi, nuntiatus","t":"verb 1","e":"announce, report"},{"i":264,"s":9,"l":"nuntius","p":"nuntii, m","t":"noun 2","e":"messenger, message, news"},{"i":265,"s":9,"l":"occido","p":"occidere, occidi, occisus","t":"verb 3","e":"kill"},{"i":266,"s":9,"l":"offero","p":"offerre, obtuli, oblatus","t":"verb irregular","e":"offer"},{"i":267,"s":9,"l":"olim","p":"","t":"adverb","e":"once, some time ago"},{"i":268,"s":9,"l":"omnis","p":"omne","t":"adjective","e":"all, every"},{"i":269,"s":9,"l":"opprimo","p":"opprimere, oppressi, oppressus","t":"verb 3","e":"crush, overwhelm"},{"i":270,"s":9,"l":"oppugno","p":"oppugnare, oppugnavi, oppugnatus","t":"verb 1","e":"attack"},{"i":271,"s":10,"l":"oro","p":"orare, oravi, oratus","t":"verb 1","e":"beg"},{"i":272,"s":10,"l":"ostendo","p":"ostendere, ostendi, ostentus","t":"verb 3","e":"show"},{"i":273,"s":10,"l":"paene","p":"","t":"adverb","e":"almost, nearly"},{"i":274,"s":10,"l":"paro","p":"parare, paravi, paratus","t":"verb 1","e":"prepare, provide"},{"i":275,"s":10,"l":"pars","p":"partis, f","t":"noun 3","e":"part"},{"i":276,"s":10,"l":"parvus","p":"parva, parvum","t":"adjective","e":"small"},{"i":277,"s":10,"l":"pater","p":"patris, m","t":"noun 3","e":"father"},{"i":278,"s":10,"l":"patior","p":"pati, passus sum","t":"verb 3 deponent","e":"suffer, endure"},{"i":279,"s":10,"l":"patria","p":"patriae, f","t":"noun 1","e":"country, homeland"},{"i":280,"s":10,"l":"pauci","p":"paucae, pauca","t":"adjective plural","e":"few, a few"},{"i":281,"s":10,"l":"pax","p":"pacis, f","t":"noun 3","e":"peace"},{"i":282,"s":10,"l":"pecunia","p":"pecuniae, f","t":"noun 1","e":"money"},{"i":283,"s":10,"l":"pello","p":"pellere, pepuli, pulsus","t":"verb 3","e":"drive"},{"i":284,"s":10,"l":"per","p":"+ accusative","t":"preposition","e":"through, along"},{"i":285,"s":10,"l":"pereo","p":"perire, perii","t":"verb irregular","e":"die, perish"},{"i":286,"s":10,"l":"periculum","p":"periculi, n","t":"noun 2","e":"danger"},{"i":287,"s":10,"l":"persuadeo","p":"persuadere, persuasi + dative","t":"verb 2","e":"persuade"},{"i":288,"s":10,"l":"perterritus","p":"perterrita, perterritum","t":"adjective","e":"terrified"},{"i":289,"s":10,"l":"pes","p":"pedis, m","t":"noun 3","e":"foot"},{"i":290,"s":10,"l":"peto","p":"petere, petivi, petitus","t":"verb 3","e":"make for, seek, beg/ask for"},{"i":291,"s":10,"l":"poena","p":"poenae, f","t":"noun 1","e":"punishment"},{"i":292,"s":10,"l":"poenas do","p":"","t":"","e":"pay the penalty, be punished"},{"i":293,"s":10,"l":"pono","p":"ponere, posui, positus","t":"verb 3","e":"put, place, set up"},{"i":294,"s":10,"l":"porta","p":"portae, f","t":"noun 1","e":"gate"},{"i":295,"s":10,"l":"porto","p":"portare, portavi, portatus","t":"verb 1","e":"carry, bear, take"},{"i":296,"s":10,"l":"possum","p":"posse, potui","t":"verb irregular","e":"can, be able"},{"i":297,"s":10,"l":"post","p":"+ accusative","t":"preposition","e":"after, behind"},{"i":298,"s":10,"l":"postea","p":"","t":"adverb","e":"afterwards"},{"i":299,"s":10,"l":"postquam","p":"","t":"conjunction","e":"after, when"},{"i":300,"s":10,"l":"postridie","p":"","t":"adverb","e":"on the next day"},{"i":301,"s":11,"l":"praemium","p":"praemii, n","t":"noun 2","e":"prize, reward, profit"},{"i":302,"s":11,"l":"primo","p":"","t":"adverb","e":"at first"},{"i":303,"s":11,"l":"primus","p":"prima, primum","t":"adjective","e":"first"},{"i":304,"s":11,"l":"princeps","p":"principis, m","t":"noun 3","e":"chief, emperor"},{"i":305,"s":11,"l":"pro","p":"+ ablative","t":"preposition","e":"in front of, for, in return for"},{"i":306,"s":11,"l":"procedo","p":"procedere, processi","t":"verb 3","e":"advance, proceed"},{"i":307,"s":11,"l":"proelium","p":"proelii, n","t":"noun 2","e":"battle"},{"i":308,"s":11,"l":"proficiscor","p":"proficisci, profectus sum","t":"verb 3 deponent","e":"set out"},{"i":309,"s":11,"l":"progredior","p":"progredi, progressus sum","t":"verb 3 deponent","e":"advance"},{"i":310,"s":11,"l":"promitto","p":"promittere, promisi, promissus","t":"verb 3","e":"promise"},{"i":311,"s":11,"l":"prope","p":"+ accusative","t":"preposition","e":"near"},{"i":312,"s":11,"l":"propter","p":"+ accusative","t":"preposition","e":"on account of, because of"},{"i":313,"s":11,"l":"proximus","p":"proxima, proximum","t":"adjective","e":"nearest, next to"},{"i":314,"s":11,"l":"puella","p":"puellae, f","t":"noun 1","e":"girl"},{"i":315,"s":11,"l":"puer","p":"pueri, m","t":"noun 2","e":"boy"},{"i":316,"s":11,"l":"pugno","p":"pugnare, pugnavi","t":"verb 1","e":"fight"},{"i":317,"s":11,"l":"pulcher","p":"pulchra, pulchrum","t":"adjective","e":"beautiful, handsome"},{"i":318,"s":11,"l":"punio","p":"punire, punivi, punitus","t":"verb 4","e":"punish"},{"i":319,"s":11,"l":"puto","p":"putare, putavi, putatus","t":"verb 1","e":"think"},{"i":320,"s":11,"l":"quaero","p":"quaerere, quaesivi, quaesitus","t":"verb 3","e":"search for, look for, ask"},{"i":321,"s":11,"l":"qualis?","p":"quale","t":"adjective","e":"what sort of?"},{"i":322,"s":11,"l":"quam","p":"+ superlative adverb","t":"","e":"as ... as possible"},{"i":323,"s":11,"l":"quam","p":"","t":"adverb","e":"than, how ... ? how ... !"},{"i":324,"s":11,"l":"quamquam","p":"","t":"conjunction","e":"although"},{"i":325,"s":11,"l":"quando?","p":"","t":"adverb","e":"when?"},{"i":326,"s":11,"l":"quantus?","p":"quanta? quantum?","t":"adjective","e":"how big? how much?"},{"i":327,"s":11,"l":"-que","p":"","t":"conjunction","e":"and"},{"i":328,"s":11,"l":"qui","p":"quae, quod","t":"pronoun","e":"who, which"},{"i":329,"s":11,"l":"quidam","p":"quaedam, quoddam","t":"pronoun","e":"one, a certain, some"},{"i":330,"s":11,"l":"quis?","p":"quid?","t":"pronoun","e":"who? what?"},{"i":331,"s":12,"l":"quo?","p":"","t":"adverb","e":"to where?"},{"i":332,"s":12,"l":"quod","p":"","t":"conjunction","e":"because"},{"i":333,"s":12,"l":"quomodo?","p":"","t":"adverb","e":"how?"},{"i":334,"s":12,"l":"quoque","p":"","t":"conjunction","e":"also, too"},{"i":335,"s":12,"l":"quot?","p":"","t":"adjective","e":"how many?"},{"i":336,"s":12,"l":"rapio","p":"rapere, rapui, raptus","t":"verb 3","e":"seize, grab"},{"i":337,"s":12,"l":"re-","p":"(prefix used with verbs)","t":"prefix","e":"- back"},{"i":338,"s":12,"l":"reddo","p":"reddere, reddidi, redditus","t":"verb 3","e":"give back, restore"},{"i":339,"s":12,"l":"redeo","p":"redire, redii","t":"verb irregular","e":"go back, come back, return"},{"i":340,"s":12,"l":"refero","p":"referre, rettuli, relatus","t":"verb irregular","e":"bring/carry back, report, tell"},{"i":341,"s":12,"l":"regina","p":"reginae, f","t":"noun 1","e":"queen"},{"i":342,"s":12,"l":"regnum","p":"regni, n","t":"noun 2","e":"kingdom"},{"i":343,"s":12,"l":"rego","p":"regere, rexi, rectus","t":"verb 3","e":"rule"},{"i":344,"s":12,"l":"regredior","p":"regredi, regressus sum","t":"verb 3 deponent","e":"go back, return"},{"i":345,"s":12,"l":"relinquo","p":"relinquere, reliqui, relictus","t":"verb 3","e":"leave, leave behind"},{"i":346,"s":12,"l":"res","p":"rei, f","t":"noun 5","e":"thing, matter, event"},{"i":347,"s":12,"l":"resisto","p":"resistere, restiti + dative","t":"verb 3","e":"resist"},{"i":348,"s":12,"l":"respondeo","p":"respondere, respondi, responsus","t":"verb 2","e":"reply"},{"i":349,"s":12,"l":"rex","p":"regis, m","t":"noun 3","e":"king"},{"i":350,"s":12,"l":"rideo","p":"ridere, risi","t":"verb 2","e":"laugh, smile"},{"i":351,"s":12,"l":"rogo","p":"rogare, rogavi, rogatus","t":"verb 1","e":"ask, ask for"},{"i":352,"s":12,"l":"Roma","p":"Romae, f (Romae: at/in Rome)","t":"noun 1","e":"Rome"},{"i":353,"s":12,"l":"Romanus","p":"Romana, Romanum","t":"adjective","e":"Roman"},{"i":354,"s":12,"l":"sacer","p":"sacra, sacrum","t":"adjective","e":"sacred"},{"i":355,"s":12,"l":"saepe","p":"","t":"adverb","e":"often"},{"i":356,"s":12,"l":"saevus","p":"saeva, saevum","t":"adjective","e":"savage, cruel"},{"i":357,"s":12,"l":"saluto","p":"salutare, salutavi, salutatus","t":"verb 1","e":"greet"},{"i":358,"s":12,"l":"sanguis","p":"sanguinis, m","t":"noun 3","e":"blood"},{"i":359,"s":12,"l":"scelestus","p":"scelesta, scelestum","t":"adjective","e":"wicked"},{"i":360,"s":12,"l":"scelus","p":"sceleris, n","t":"noun 3","e":"crime"},{"i":361,"s":13,"l":"scio","p":"scire, scivi, scitus","t":"verb 4","e":"know"},{"i":362,"s":13,"l":"scribo","p":"scribere, scripsi, scriptus","t":"verb 3","e":"write"},{"i":363,"s":13,"l":"se","p":"sui","t":"pronoun","e":"himself, herself, itself, themselves"},{"i":364,"s":13,"l":"sed","p":"","t":"conjunction","e":"but"},{"i":365,"s":13,"l":"sedeo","p":"sedere, sedi","t":"verb 2","e":"sit"},{"i":366,"s":13,"l":"semper","p":"","t":"adverb","e":"always"},{"i":367,"s":13,"l":"senator","p":"senatoris, m","t":"noun 3","e":"senator"},{"i":368,"s":13,"l":"senex","p":"senis, m","t":"noun 3","e":"old man"},{"i":369,"s":13,"l":"sentio","p":"sentire, sensi, sensus","t":"verb 4","e":"feel, notice"},{"i":370,"s":13,"l":"sequor","p":"sequi, secutus sum","t":"verb 3 deponent","e":"follow"},{"i":371,"s":13,"l":"servo","p":"servare, servavi, servatus","t":"verb 1","e":"save, protect, keep"},{"i":372,"s":13,"l":"servus","p":"servi, m","t":"noun 2","e":"slave"},{"i":373,"s":13,"l":"si","p":"","t":"conjunction","e":"if"},{"i":374,"s":13,"l":"sic","p":"","t":"adverb","e":"thus, in this way"},{"i":375,"s":13,"l":"silva","p":"silvae, f","t":"noun 1","e":"wood"},{"i":376,"s":13,"l":"simul","p":"","t":"adverb","e":"at the same time"},{"i":377,"s":13,"l":"simulac, simulatque","p":"","t":"conjunction","e":"as soon as"},{"i":378,"s":13,"l":"sine","p":"+ ablative","t":"preposition","e":"without"},{"i":379,"s":13,"l":"soleo","p":"solere, solitus sum","t":"verb 2","e":"be accustomed"},{"i":380,"s":13,"l":"solus","p":"sola, solum","t":"adjective","e":"alone, lonely, only, on one's own"},{"i":381,"s":13,"l":"specto","p":"spectare, spectavi, spectatus","t":"verb 1","e":"look at, watch"},{"i":382,"s":13,"l":"spero","p":"sperare, speravi, speratus","t":"verb 1","e":"hope, expect"},{"i":383,"s":13,"l":"spes","p":"spei, f","t":"noun 5","e":"hope"},{"i":384,"s":13,"l":"statim","p":"","t":"adverb","e":"at once, immediately"},{"i":385,"s":13,"l":"sto","p":"stare, steti","t":"verb 1","e":"stand"},{"i":386,"s":13,"l":"stultus","p":"stulta, stultum","t":"adjective","e":"stupid, foolish"},{"i":387,"s":13,"l":"sub","p":"+ accusative/ablative","t":"preposition","e":"under, beneath"},{"i":388,"s":13,"l":"subito","p":"","t":"adverb","e":"suddenly"},{"i":389,"s":13,"l":"sum","p":"esse, fui","t":"verb irregular","e":"be"},{"i":390,"s":13,"l":"summus","p":"summa, summum","t":"adjective","e":"highest, greatest, top (of)"},{"i":391,"s":14,"l":"supero","p":"superare, superavi, superatus","t":"verb 1","e":"overcome, overpower"},{"i":392,"s":14,"l":"surgo","p":"surgere, surrexi","t":"verb 3","e":"get up, stand up, rise"},{"i":393,"s":14,"l":"suus","p":"sua, suum","t":"pronoun","e":"his, her, its, their (own)"},{"i":394,"s":14,"l":"taberna","p":"tabernae, f","t":"noun 1","e":"shop, inn"},{"i":395,"s":14,"l":"taceo","p":"tacere, tacui, tacitus","t":"verb 2","e":"be silent, be quiet"},{"i":396,"s":14,"l":"talis","p":"tale","t":"adjective","e":"such, of such a kind"},{"i":397,"s":14,"l":"tam","p":"","t":"adverb","e":"so"},{"i":398,"s":14,"l":"tamen","p":"","t":"adverb","e":"however"},{"i":399,"s":14,"l":"tandem","p":"","t":"adverb","e":"at last, finally"},{"i":400,"s":14,"l":"tantus","p":"tanta, tantum","t":"adjective","e":"so great, such a great"},{"i":401,"s":14,"l":"tempestas","p":"tempestatis, f","t":"noun 3","e":"storm"},{"i":402,"s":14,"l":"templum","p":"templi, n","t":"noun 2","e":"temple"},{"i":403,"s":14,"l":"tempus","p":"temporis, n","t":"noun 3","e":"time"},{"i":404,"s":14,"l":"teneo","p":"tenere, tenui, tentus","t":"verb 2","e":"hold"},{"i":405,"s":14,"l":"terra","p":"terrae, f","t":"noun 1","e":"ground, land, country"},{"i":406,"s":14,"l":"terreo","p":"terrere, terrui, territus","t":"verb 2","e":"frighten"},{"i":407,"s":14,"l":"timeo","p":"timere, timui","t":"verb 2","e":"fear, be afraid"},{"i":408,"s":14,"l":"tollo","p":"tollere, sustuli, sublatus","t":"verb 3","e":"raise, lift up, hold up"},{"i":409,"s":14,"l":"tot","p":"","t":"adjective","e":"so many"},{"i":410,"s":14,"l":"totus","p":"tota, totum","t":"adjective","e":"whole"},{"i":411,"s":14,"l":"trado","p":"tradere, tradidi, traditus","t":"verb 3","e":"hand over, hand down"},{"i":412,"s":14,"l":"traho","p":"trahere, traxi, tractus","t":"verb 3","e":"drag"},{"i":413,"s":14,"l":"trans","p":"+ accusative (also used as prefix with verbs)","t":"preposition","e":"across"},{"i":414,"s":14,"l":"tristis","p":"triste","t":"adjective","e":"sad"},{"i":415,"s":14,"l":"tu","p":"tui","t":"pronoun","e":"you (singular)"},{"i":416,"s":14,"l":"tum","p":"","t":"adverb","e":"then"},{"i":417,"s":14,"l":"turba","p":"turbae, f","t":"noun 1","e":"crowd"},{"i":418,"s":14,"l":"tuus","p":"tua, tuum","t":"pronoun","e":"your (singular), yours"},{"i":419,"s":14,"l":"ubi","p":"","t":"adverb","e":"where? where, when"},{"i":420,"s":14,"l":"umquam","p":"","t":"adverb","e":"ever"},{"i":421,"s":15,"l":"unde?","p":"","t":"adverb","e":"from where?"},{"i":422,"s":15,"l":"urbs","p":"urbis, f","t":"noun 3","e":"city"},{"i":423,"s":15,"l":"ut","p":"indeclinable + subjunctive","t":"conjunction","e":"that, so that, in order that"},{"i":424,"s":15,"l":"ut","p":"indeclinable + indicative","t":"conjunction","e":"as, when"},{"i":425,"s":15,"l":"uxor","p":"uxoris, f","t":"noun 3","e":"wife"},{"i":426,"s":15,"l":"validus","p":"valida, validum","t":"adjective","e":"strong"},{"i":427,"s":15,"l":"vehementer","p":"","t":"adverb","e":"violently, loudly"},{"i":428,"s":15,"l":"vendo","p":"vendere, vendidi, venditus","t":"verb 3","e":"sell"},{"i":429,"s":15,"l":"venio","p":"venire, veni","t":"verb 4","e":"come"},{"i":430,"s":15,"l":"verbum","p":"verbi, n","t":"noun 2","e":"word"},{"i":431,"s":15,"l":"verto","p":"vertere, verti, versus","t":"verb 3","e":"turn"},{"i":432,"s":15,"l":"vester","p":"vestra, vestrum","t":"pronoun","e":"your (plural), yours"},{"i":433,"s":15,"l":"via","p":"viae, f","t":"noun 1","e":"street, road, way"},{"i":434,"s":15,"l":"victoria","p":"victoriae, f","t":"noun 1","e":"victory"},{"i":435,"s":15,"l":"video","p":"videre, vidi, visus","t":"verb 2","e":"see"},{"i":436,"s":15,"l":"videor","p":"videri, visus sum","t":"verb 2 deponent","e":"seem, appear"},{"i":437,"s":15,"l":"villa","p":"villae, f","t":"noun 1","e":"house, country villa"},{"i":438,"s":15,"l":"vinco","p":"vincere, vici, victus","t":"verb 3","e":"conquer, win, be victorious"},{"i":439,"s":15,"l":"vinum","p":"vini, n","t":"noun 2","e":"wine"},{"i":440,"s":15,"l":"vir","p":"viri, m","t":"noun 2","e":"man"},{"i":441,"s":15,"l":"virtus","p":"virtutis, f","t":"noun 3","e":"courage, virtue"},{"i":442,"s":15,"l":"vita","p":"vitae, f","t":"noun 1","e":"life"},{"i":443,"s":15,"l":"vivo","p":"vivere, vixi","t":"verb 3","e":"live, be alive"},{"i":444,"s":15,"l":"voco","p":"vocare, vocavi, vocatus","t":"verb 1","e":"call"},{"i":445,"s":15,"l":"volo","p":"velle, volui","t":"verb irregular","e":"want, wish, be willing"},{"i":446,"s":15,"l":"vos","p":"vestrum","t":"pronoun","e":"you (plural)"},{"i":447,"s":15,"l":"vox","p":"vocis, f","t":"noun 3","e":"voice, shout"},{"i":448,"s":15,"l":"vulnero","p":"vulnerare, vulneravi, vulneratus","t":"verb 1","e":"wound, injure"},{"i":449,"s":15,"l":"vulnus","p":"vulneris, n","t":"noun 3","e":"wound"}];
+const SECTIONS = [...new Set(V.map(w=>w.s))];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- storage ---------- */
+const KEY='gcseLatinVocab.v1';
+let P = {}, SETTINGS = {};
+try{ const raw=JSON.parse(localStorage.getItem(KEY)||'{}'); P=raw.p||{}; SETTINGS=raw.s||{}; }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({p:P,s:SETTINGS})); }catch(e){} }
+const prog = i => P[i] || {seen:0,right:0,streak:0,last:null,f:0};
+function record(i, correct, hinted){
+  const p = {...prog(i)}; p.seen++;
+  if(correct){ p.right++; if(!hinted) p.streak++; p.last=1; } else { p.streak=0; p.last=0; }
+  P[i]=p; save();
+}
+function recordFlash(i, knew){
+  const p = {...prog(i)}; p.f = Math.max(0, (p.f||0) + (knew ? -1 : 1)); P[i]=p; save();
+}
+/* How much a word needs practice. Higher = comes up more often. */
+function need(i){
+  const p = prog(i);
+  let w;
+  if(!p.seen) w = 3;
+  else if(p.last===0) w = 6;
+  else w = [5, 2.5, 1, 0.6, 0.3][Math.min(p.streak,4)];
+  if(p.seen){ const wrongRate = (p.seen-p.right)/p.seen; w *= 1 + 1.5*wrongRate; }
+  w *= 1 + 0.3*Math.min(p.f||0, 5);
+  return w;
+}
+function weightedShuffle(list){
+  return list.map(w=>({w, k: Math.pow(Math.random(), 1/need(w.i))})).sort((a,b)=>b.k-a.k).map(x=>x.w);
+}
+const learnt = i => prog(i).streak>=2;
+
+/* ---------- state ---------- */
+const st = {
+  secs: new Set(SETTINGS.secs || [1]),
+  dir: SETTINGS.dir || 'le',
+  count: SETTINGS.count ?? 20,
+  order: SETTINGS.order2 || 'smart'
+};
+function persist(){ SETTINGS={secs:[...st.secs],dir:st.dir,count:st.count,order2:st.order}; save(); }
+
+/* ---------- answer checking ---------- */
+function stripAcc(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function normEn(s){
+  s = stripAcc(s.toLowerCase()).replace(/[’‘`]/g,"'")
+      .replace(/\.\.\.|…/g,' ').replace(/[.?!"()=;:]/g,' ').replace(/-/g,' ')
+      .replace(/\s+/g,' ').trim();
+  let prev;
+  do{ prev=s; s=s.replace(/^(to|the|a|an) /,''); }while(s!==prev);
+  return s.trim();
+}
+function normLa(s){ return stripAcc(s.toLowerCase()).replace(/[^a-z]/g,''); }
+function splitTop(str){ // split on commas not inside brackets
+  const out=[]; let d=0, cur='';
+  for(const c of str){ if(c==='(')d++; if(c===')')d--; if(c===','&&d===0){out.push(cur);cur='';} else cur+=c; }
+  out.push(cur); return out.map(x=>x.trim()).filter(Boolean);
+}
+function expandSlash(s){
+  const m = s.match(/(\S+)\/(\S+)/);
+  if(!m) return [s];
+  return [...expandSlash(s.replace(m[0],m[1])), ...expandSlash(s.replace(m[0],m[2]))];
+}
+const enCache = {};
+function enVariants(w){
+  if(enCache[w.i]) return enCache[w.i];
+  const set = new Set([normEn(w.e)]);
+  for(const part of splitTop(w.e)){
+    const noParen = part.replace(/\([^)]*\)/g,'').trim();
+    const inner = part.replace(/[()]/g,' ');
+    const inside = (part.match(/\(([^)]*)\)/)||[])[1];
+    const cands = [noParen||inner, inner];
+    if(!noParen && inside){ cands.push(inside.replace(/^introduces /,'')); }
+    for(const c of cands) for(const x of expandSlash(c)){
+      const n = normEn(x); if(!n) continue;
+      set.add(n);
+      if(n.startsWith('be ') && n.length>5) set.add(n.slice(3));
+      if(/\?$/.test(part.trim())) set.add(n);
+    }
+    if(/prefix = away/.test(part)) set.add('away');
+  }
+  return enCache[w.i] = [...set];
+}
+function laVariants(w){ return w.l.split(',').map(normLa).filter(Boolean); }
+function lev(a,b){
+  if(Math.abs(a.length-b.length)>2) return 9;
+  const d=[...Array(b.length+1).keys()];
+  for(let i=1;i<=a.length;i++){ let p=d[0]; d[0]=i;
+    for(let j=1;j<=b.length;j++){ const t=d[j]; d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1)); p=t; } }
+  return d[b.length];
+}
+function tol(n){ return n>=8?2:n>=4?1:0; }
+function bestMatch(input, targets){
+  // returns 'ok' | 'near' | null
+  let near=false;
+  for(const t of targets){
+    if(input===t) return 'ok';
+    if(lev(input,t)<=tol(t.length)) near=true;
+  }
+  return near?'near':null;
+}
+function checkLE(w, raw){
+  const pieces = raw.split(/[,;\/]| or /).map(normEn).filter(Boolean);
+  if(!pieces.length) return {res:null};
+  const targets = enVariants(w);
+  let res=null;
+  for(const p of pieces){ const r=bestMatch(p,targets); if(r==='ok') return {res:'ok'}; if(r==='near') res='near'; }
+  return {res};
+}
+function checkEL(w, raw){
+  const a = normLa(raw);
+  if(!a) return {res:null};
+  const mine = laVariants(w);
+  if(mine.includes(a)) return {res:'ok'};
+  // another headword with the same meaning(s)?
+  const myMeans = new Set(enVariants(w));
+  for(const o of V){
+    if(o.i===w.i) continue;
+    if(laVariants(o).includes(a)){
+      if(normEn(o.e)===normEn(w.e)) return {res:'ok', alt:o};
+      if(enVariants(o).some(x=>myMeans.has(x))) return {res:'other', alt:o};
+    }
+  }
+  return {res: bestMatch(a, mine)};
+}
+
+/* ---------- rendering helpers ---------- */
+function entryHTML(w){
+  return `<div class="entry"><span class="lw">${esc(w.l)}</span>${w.p?`, <span class="pp">${esc(w.p)}</span>`:''} <span class="small">(${esc(w.t||'phrase')})</span><br>= ${esc(w.e)}</div>`;
+}
+function show(id){
+  for(const s of ['setup','quiz','flash','results','list']) $(s).classList.toggle('hidden', s!==id);
+  $('homeBtn').classList.toggle('hidden', id==='setup');
+  window.scrollTo(0,0);
+}
+function shuffle(a){ a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+const posOf = w => (w.t||'').split(' ')[0] || 'other';
+
+/* ---------- setup screen ---------- */
+function renderSetup(){
+  const g=$('secGrid'); g.innerHTML='';
+  for(const s of SECTIONS){
+    const words=V.filter(w=>w.s===s);
+    const pct=Math.round(100*words.filter(w=>learnt(w.i)).length/words.length);
+    const b=document.createElement('button');
+    b.className='sec'; b.setAttribute('aria-pressed', st.secs.has(s));
+    b.innerHTML=`<b>Section ${s}</b><small>${esc(words[0].l)} to ${esc(words[words.length-1].l)}</small><i class="bar" style="width:${pct}%"></i>`;
+    b.title=`${pct}% learnt`;
+    b.onclick=()=>{ st.secs.has(s)?st.secs.delete(s):st.secs.add(s); persist(); renderSetup(); };
+    g.appendChild(b);
+  }
+  const pool=poolWords();
+  $('selInfo').textContent = pool.length ? `${pool.length} words selected, ${pool.filter(w=>learnt(w.i)).length} learnt` : 'Pick at least one section';
+  document.querySelectorAll('[data-dir]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.dir===st.dir));
+  document.querySelectorAll('[data-count]').forEach(b=>b.setAttribute('aria-pressed', +b.dataset.count===st.count));
+  document.querySelectorAll('[data-order]').forEach(b=>b.setAttribute('aria-pressed', b.dataset.order===st.order));
+  $('orderNote').textContent = {
+    smart:'Words you got wrong or haven\'t learnt yet are picked much more often. Words you know well still turn up now and then.',
+    weak:'The words you find hardest come first, then the ones you haven\'t tried yet.',
+    random:'Every word has the same chance of coming up.'}[st.order];
+  document.querySelectorAll('.mode').forEach(b=>b.disabled=!pool.length);
+  const tricky=trickyWords();
+  $('trickyBtn').disabled=!tricky.length;
+  $('trickyInfo').textContent = tricky.length ? `${tricky.length} word${tricky.length>1?'s':''} from any section that you got wrong last time` : 'Words you get wrong will be collected here';
+}
+const poolWords = () => V.filter(w=>st.secs.has(w.s));
+const trickyWords = () => V.filter(w=>prog(w.i).last===0);
+function pickWords(pool){
+  let list;
+  if(st.order==='weak') list = shuffle(pool).sort((a,b)=>need(b.i)-need(a.i));
+  else if(st.order==='smart') list = weightedShuffle(pool);
+  else list = shuffle(pool);
+  list = st.count ? list.slice(0, st.count) : list;
+  return st.order==='weak' ? list : shuffle(list);
+}
+document.querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>{st.dir=b.dataset.dir;persist();renderSetup();});
+document.querySelectorAll('[data-count]').forEach(b=>b.onclick=()=>{st.count=+b.dataset.count;persist();renderSetup();});
+document.querySelectorAll('[data-order]').forEach(b=>b.onclick=()=>{st.order=b.dataset.order;persist();renderSetup();});
+$('selAll').onclick=()=>{SECTIONS.forEach(s=>st.secs.add(s));persist();renderSetup();};
+$('selNone').onclick=()=>{st.secs.clear();persist();renderSetup();};
+$('resetBtn').onclick=()=>{ if(confirm('Clear all your saved progress?')){P={};save();renderSetup();} };
+$('homeBtn').onclick=()=>{renderSetup();show('setup');};
+document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{
+  const pool=poolWords(); if(!pool.length) return;
+  const m=b.dataset.mode;
+  if(m==='flash') startFlash(pool);
+  else if(m==='list') startList(pool);
+  else startQuiz(m, pickWords(pool));
+});
+$('trickyBtn').onclick=()=>startQuiz('type', shuffle(trickyWords()));
+
+/* ---------- quiz ---------- */
+let Q=null;
+function startQuiz(mode, words){
+  Q={mode, words:words.map(w=>({w,rep:0})), n:words.length, idx:0, score:0, missed:[], answered:false, hinted:false, dir:st.dir, repeats:0};
+  show('quiz'); renderQ();
+}
+function renderQ(){
+  const it=Q.words[Q.idx], w=it.w; Q.answered=false; Q.hinted=false;
+  $('qCount').innerHTML = it.rep ? `<b style="color:var(--ochre)">Coming back to this one</b>` : `Word ${Q.words.slice(0,Q.idx+1).filter(x=>!x.rep).length} of ${Q.n}`;
+  $('qScore').textContent=`Score: ${Q.score}`;
+  $('qBar').style.width = (100*Q.idx/Q.words.length)+'%';
+  const le = Q.dir==='le';
+  $('qPrompt').textContent = le ? w.l : w.e;
+  $('qPrompt').classList.toggle('en', !le);
+  $('qGram').textContent = le ? (w.p ? w.p + (w.t?' ('+w.t+')':'') : (w.t||'')) : (w.t ? `Latin ${w.t}` : 'Latin phrase');
+  $('qAsk').textContent = Q.mode==='type'
+      ? (le ? 'Type one English meaning' : 'Type the Latin word (first form is enough)')
+      : (le ? 'Choose the meaning' : 'Choose the Latin word');
+  $('fb').innerHTML='';
+  $('typeArea').classList.toggle('hidden', Q.mode!=='type');
+  $('mcArea').classList.toggle('hidden', Q.mode!=='mc');
+  if(Q.mode==='type'){
+    const inp=$('typeIn'); inp.value=''; inp.className=''; inp.disabled=false;
+    $('checkBtn').disabled=false; $('hintLine').textContent=''; $('hintBtn').disabled=false; $('skipBtn').disabled=false;
+    inp.focus();
+  } else renderMC(w);
+  $('qScore').textContent = `First-try score: ${Q.score}`;
+}
+function renderMC(w){
+  const le=Q.dir==='le';
+  const label = x => le ? x.e : x.l;
+  const pool = (poolWords().length>=8 ? poolWords() : V).filter(x=>x.i!==w.i && label(x)!==label(w));
+  const samePos = shuffle(pool.filter(x=>posOf(x)===posOf(w)));
+  const other = shuffle(pool.filter(x=>posOf(x)!==posOf(w)));
+  const picks=[]; const seen=new Set([normEn(label(w))]);
+  for(const x of [...samePos,...other]){ const k=normEn(label(x)); if(seen.has(k)) continue; seen.add(k); picks.push(x); if(picks.length===3) break; }
+  const opts = shuffle([w,...picks]);
+  const area=$('mcArea'); area.innerHTML='';
+  opts.forEach((o,k)=>{
+    const b=document.createElement('button'); b.className='opt'+(le?'':' latin');
+    b.innerHTML=`<kbd>${k+1}</kbd><span>${esc(label(o))}</span>`;
+    b.onclick=()=>answerMC(o,b,w);
+    b.dataset.correct = o.i===w.i;
+    area.appendChild(b);
+  });
+}
+function answerMC(o,btn,w){
+  if(Q.answered) return; Q.answered=true;
+  const ok=o.i===w.i;
+  document.querySelectorAll('#mcArea .opt').forEach(b=>{ b.disabled=true; if(b.dataset.correct==='true') b.classList.add('right'); });
+  if(!ok) btn.classList.add('wrong');
+  finish(ok ? 'ok':'bad', w, null);
+}
+$('typeForm').addEventListener('submit', e=>{ e.preventDefault(); if(Q && !Q.answered) submitType(); else if(Q && Q.answered) next(); });
+function submitType(){
+  const w=Q.words[Q.idx].w; const raw=$('typeIn').value.trim();
+  if(!raw){ $('typeIn').focus(); return; }
+  const r = Q.dir==='le' ? checkLE(w,raw) : checkEL(w,raw);
+  if(r.res==='other'){
+    $('hintLine').innerHTML = `<b>${esc(r.alt.l)}</b> means “${esc(r.alt.e)}”. Close, but there's a better word for this one. Try again.`;
+    $('typeIn').select(); return;
+  }
+  finish(r.res==='ok'?'ok':r.res==='near'?'near':'bad', w, raw, r.alt);
+}
+$('hintBtn').onclick=()=>{
+  if(Q.answered) return;
+  const w=Q.words[Q.idx].w; Q.hinted=true;
+  const target = Q.dir==='le' ? splitTop(w.e)[0].replace(/\([^)]*\)/g,'').trim() : w.l.split(',')[0].trim();
+  const clean = target.replace(/^(to |the |a |an )/i,'');
+  $('hintLine').textContent = `Starts with “${clean[0]}”, ${clean.replace(/[^a-zA-Z]/g,'').length} letters`;
+  $('hintBtn').disabled=true; $('typeIn').focus();
+};
+$('skipBtn').onclick=()=>{ if(!Q.answered) finish('bad', Q.words[Q.idx].w, ''); };
+function finish(kind, w, raw, alt){
+  Q.answered=true;
+  const ok = kind!=='bad';
+  const it = Q.words[Q.idx];
+  if(!it.rep){ if(ok) Q.score++; else Q.missed.push(w); record(w.i, ok, Q.hinted); }
+  else if(!ok) record(w.i, false, false);
+  const shaky = !ok || Q.hinted;
+  if(shaky && it.rep<2) queueRepeat(it);
+  if(Q.mode==='type'){ const inp=$('typeIn'); inp.className = kind==='ok'?'ok':kind==='near'?'near':'bad'; inp.disabled=true; $('checkBtn').disabled=true; $('hintBtn').disabled=true; $('skipBtn').disabled=true; }
+  $('qScore').textContent=`First-try score: ${Q.score}`;
+  const title = kind==='ok' ? (Q.hinted?'Correct (with a hint)':'Correct!') : kind==='near' ? 'Nearly! Counted as right, but check the spelling' : (raw===''?'Here it is':'Not this time');
+  let extra='';
+  if(alt && kind==='ok') extra=`<div class="you">${esc(alt.l)} is also right here.</div>`;
+  if(raw && kind!=='ok') extra+=`<div class="you">You wrote: “${esc(raw)}”</div>`;
+  const override = (Q.mode==='type' && kind==='bad' && raw) ? `<button class="btn" id="overBtn">I was right, count it</button>` : '';
+  $('fb').innerHTML = `<div class="fb ${kind}"><h3>${title}</h3>${entryHTML(w)}${extra}
+    <div class="fbrow"><button class="btn go" id="nextBtn">${Q.idx+1<Q.words.length?'Next question':'See my score'} (Enter)</button>${override}</div></div>`;
+  if(shaky && it.rep<2) $('fb').querySelector('.fbrow').insertAdjacentHTML('beforebegin','<div class="you">This word will come back again later in the test.</div>');
+  $('nextBtn').onclick=next;
+  if($('overBtn')) $('overBtn').onclick=()=>{
+    if(!it.rep){ Q.score++; Q.missed.pop(); const p=prog(w.i); p.streak++; p.right++; p.last=1; P[w.i]=p; save(); }
+    unqueueRepeat(it);
+    $('qScore').textContent=`First-try score: ${Q.score}`;
+    $('fb').querySelector('.fb').className='fb ok'; $('fb').querySelector('h3').textContent='Counted as correct';
+    $('overBtn').remove(); $('nextBtn').focus();
+  };
+  $('nextBtn').focus();
+}
+function queueRepeat(it){
+  const gap = 3 + Math.floor(Math.random()*3);
+  const pos = Math.min(Q.idx + 1 + gap, Q.words.length);
+  Q.words.splice(pos, 0, {w:it.w, rep:it.rep+1, from:it});
+  Q.repeats++;
+}
+function unqueueRepeat(it){
+  const k = Q.words.findIndex((x,j)=>j>Q.idx && x.from===it);
+  if(k>-1){ Q.words.splice(k,1); Q.repeats--; }
+  const note=[...$('fb').querySelectorAll('.you')].find(d=>/come back/.test(d.textContent)); if(note) note.remove();
+  const nb=$('nextBtn'); if(nb) nb.textContent = (Q.idx+1<Q.words.length?'Next question':'See my score')+' (Enter)';
+}
+function next(){
+  if(!Q.answered) return;
+  Q.idx++;
+  if(Q.idx>=Q.words.length) return results();
+  renderQ();
+}
+document.addEventListener('keydown', e=>{
+  if($('quiz').classList.contains('hidden')) return;
+  if(Q.mode==='mc' && !Q.answered && /^[1-4]$/.test(e.key)){ const b=$('mcArea').children[+e.key-1]; if(b) b.click(); }
+  else if(Q.answered && e.key==='Enter' && document.activeElement.id!=='overBtn'){ e.preventDefault(); next(); }
+});
+
+/* ---------- results ---------- */
+function results(){
+  show('results');
+  const n=Q.n, pct=Math.round(100*Q.score/n);
+  $('rMode').textContent = `${Q.mode==='type'?'Type-in test':'Multiple choice'}, ${Q.dir==='le'?'Latin → English':'English → Latin'}`;
+  $('rScore').textContent = `${Q.score} / ${n}`;
+  $('rMode').textContent += Q.repeats ? `. First-try score, plus ${Q.repeats} extra go${Q.repeats>1?'es':''} at words that needed another try.` : '. First-try score.';
+  $('rMsg').textContent = pct===100 ? 'Perfect score. Try a type-in test or the other direction next.' :
+    pct>=80 ? `${pct}%. Strong work. Go over the few below, then retest them.` :
+    pct>=50 ? `${pct}%. Getting there. Look at the words below, then retest just those.` :
+    `${pct}%. Try the flashcards for this section first, then test again.`;
+  $('rRetry').classList.toggle('hidden', !Q.missed.length);
+  $('rMissH').classList.toggle('hidden', !Q.missed.length);
+  $('rMiss').innerHTML = Q.missed.map(w=>`<li>${entryHTML(w)}</li>`).join('');
+  $('rRetry').onclick=()=>startQuiz('type', shuffle(Q.missed));
+  $('rAgain').onclick=()=>startQuiz(Q.mode, pickWords(poolWords()));
+  $('rHome').onclick=()=>{renderSetup();show('setup');};
+}
+
+/* ---------- flashcards ---------- */
+let F=null;
+function startFlash(pool){
+  F={deck: st.order==='random' ? shuffle(pool) : weightedShuffle(pool), total:pool.length, done:0, flipped:false, dir:st.dir};
+  show('flash'); renderF();
+}
+function renderF(){
+  if(!F.deck.length){
+    $('fFront').textContent='Deck finished'; $('fFront').classList.add('en');
+    $('fGram').textContent=`You worked through all ${F.total} words.`;
+    $('fBack').classList.add('hidden'); $('fTap').textContent='Now try a type-in test from the menu.';
+    $('fNo').disabled=$('fYes').disabled=true; $('fBar').style.width='100%'; $('fLeft').textContent='';
+    return;
+  }
+  $('fNo').disabled=$('fYes').disabled=false;
+  const w=F.deck[0]; F.flipped=false;
+  const le=F.dir==='le';
+  $('fFront').textContent = le ? w.l : w.e; $('fFront').classList.toggle('en', !le);
+  $('fGram').textContent = le ? (w.t||'') : (w.t?`Latin ${w.t}`:'');
+  $('fBack').innerHTML = le ? `<div class="mean">${esc(w.e)}</div><div class="entry"><span class="pp">${esc([w.l,w.p].filter(Boolean).join(', '))}</span></div>`
+                            : `<div class="mean" style="font-family:var(--serif)">${esc(w.l)}</div><div class="entry"><span class="pp">${esc(w.p)}</span></div>`;
+  $('fBack').classList.add('hidden'); $('fTap').textContent='Tap the card or press Space to flip';
+  $('fCount').textContent=`Learnt ${F.done} of ${F.total}`; $('fLeft').textContent=`${F.deck.length} cards left`;
+  $('fBar').style.width=(100*F.done/F.total)+'%';
+}
+function flipF(){ if(!F||!F.deck.length) return; F.flipped=!F.flipped; $('fBack').classList.toggle('hidden',!F.flipped); $('fTap').textContent=F.flipped?'Did you know it?':'Tap the card or press Space to flip'; }
+$('fCard').onclick=flipF;
+$('fYes').onclick=()=>{ if(!F.deck.length) return; const w=F.deck.shift(); recordFlash(w.i,true); F.done++; renderF(); };
+$('fNo').onclick=()=>{ if(!F.deck.length) return; const w=F.deck.shift(); recordFlash(w.i,false); F.deck.splice(Math.min(2+Math.floor(Math.random()*3),F.deck.length),0,w); renderF(); };
+document.addEventListener('keydown', e=>{
+  if($('flash').classList.contains('hidden')) return;
+  if(e.key===' '){ e.preventDefault(); flipF(); }
+  if(e.key==='1') $('fNo').click();
+  if(e.key==='2') $('fYes').click();
+});
+
+/* ---------- list ---------- */
+function startList(pool){
+  show('list');
+  $('lInfo').textContent=`${pool.length} words. Tap a hidden meaning to reveal it.`;
+  $('lBody').innerHTML = pool.map(w=>{
+    const p=prog(w.i);
+    const dot = !p.seen?'':p.streak>=2?'g':p.last===0?'r':'o';
+    const sec = st.secs.size>1 && (pool[0]===w || pool[pool.indexOf(w)-1].s!==w.s) ? `<tr><th colspan="5" style="padding-top:14px">Section ${w.s}</th></tr>` : '';
+    return `${sec}<tr><td class="st"><i class="dot ${dot}"></i></td><td class="lw">${esc(w.l)}</td><td class="pp">${esc(w.p)}</td><td>${esc(w.t)}</td><td class="mn"><span>${esc(w.e)}</span></td></tr>`;
+  }).join('');
+  $('lWrap').classList.remove('hide-en'); $('lHide').textContent='Hide meanings';
+}
+$('lHide').onclick=()=>{ const h=$('lWrap').classList.toggle('hide-en'); $('lHide').textContent=h?'Show meanings':'Hide meanings'; document.querySelectorAll('#lBody td.mn span').forEach(s=>s.style.filter=''); };
+$('lBody').addEventListener('click', e=>{ const s=e.target.closest('td.mn span'); if(s && $('lWrap').classList.contains('hide-en')) s.style.filter='none'; });
+
+renderSetup();
+</script>
+</body>
+</html>

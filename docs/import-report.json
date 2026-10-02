@@ -1,0 +1,52 @@
+{
+  "source": "Teacher-created GCSE Latin Vocab Trainer.html",
+  "sha256": "484db37c1cc6d00d873dcdd85f3298728d53ebfff934e3e11aa94682e6be8001",
+  "records": 450,
+  "sections": {
+    "1": 30,
+    "2": 31,
+    "3": 30,
+    "4": 30,
+    "5": 29,
+    "6": 31,
+    "7": 30,
+    "8": 30,
+    "9": 30,
+    "10": 30,
+    "11": 30,
+    "12": 30,
+    "13": 30,
+    "14": 30,
+    "15": 29
+  },
+  "missingTypes": [
+    12,
+    118,
+    292,
+    322
+  ],
+  "duplicateHeadwords": [
+    {
+      "id": 75,
+      "latin": "cum"
+    },
+    {
+      "id": 168,
+      "latin": "in"
+    },
+    {
+      "id": 323,
+      "latin": "quam"
+    },
+    {
+      "id": 424,
+      "latin": "ut"
+    }
+  ],
+  "notes": [
+    "Unequal section sizes are preserved, not forced to 30.",
+    "Duplicate headwords represent distinct entries, not duplicate IDs.",
+    "No metadata beyond explicit HTML fields is inferred.",
+    "Supplementary DOCX contains indeclinable annotations absent from HTML and ilIa vs illa at entry 163; HTML values retained."
+  ]
+}

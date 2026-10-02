@@ -1,0 +1,13 @@
+# Static architecture and data schema
+
+GitHub Pages serves the built React/TypeScript/Vite files over HTTPS. The latest 1 October 2026 decision supersedes the earlier Supabase architecture: no authentication, accounts, server functions, database service or backend keys. The complete reference audit and domain modules are preserved.
+
+`src/domain/` contains grading, FSRS and session generation, independently of UI and persistence. Structured seed content lives in `src/data/vocabulary.json`, reproducibly extracted from the teacher reference. `src/storage.ts` owns browser persistence and backup validation. `src/App.tsx` implements the responsive workflows and backup interface.
+
+IndexedDB database `gcse-latin-mastery`, version 1, stores `progress/current`: `{revision, snapshot}`. Snapshot contains review states keyed by word and skill, timestamped attempts, directed confusion pairs and the active session. An atomic read/write transaction commits the answer, memory state, confusion increment, attempt history and session cursor together. Reopening the application reads this record. Session ID/revision/cursor detect stale tab submissions; retries after an advanced cursor return the saved result without another attempt. BroadcastChannel/focus events update dashboard data. Active stale questions require explicit reload, preserving the typed answer on failure.
+
+LE and EL are independent cards, with separate principal-part/grammar cards where supported. History records raw answer, grade, format, time, response duration, repeat index and confusion ID. Same-session reinsertion stays separate from long-term scheduling. Introduction and flashcard viewing do not establish mastery.
+
+Backup envelope: `{app:'gcse-latin-mastery', version:1, dataset:<source SHA256>, exportedAt, snapshot}`. Zod rejects unsupported versions, incompatible vocabulary, unknown fields/IDs, malformed timestamps, nonfinite/out-of-range metrics and invalid session positions. Additional checks reject duplicate cards/confusion pairs, unsupported skills and contradictory feedback/questions. Backup size is limited to 25 MB. Saves validate before committing, retaining a valid exportable prior profile on failure. Imports replace current progress only after review/confirmation and a revision check; they do not merge histories.
+
+Browser storage belongs to this browser profile and deployment origin. It is not encrypted account storage and does not sync automatically. Users explicitly export and import to transfer progress. Site data clearing/private mode/storage restrictions can remove or prevent persistence; the interface explains this and reports errors. No learning data or personal information is sent to an application backend. GitHub Pages receives normal file requests.

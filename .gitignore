@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env*
+!.env.example
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Supplementary teacher document stays in the private audit workspace.
+reference/teacher-sections.docx
