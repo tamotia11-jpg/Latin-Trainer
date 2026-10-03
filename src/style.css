@@ -142,16 +142,6 @@ small {
   text-transform: uppercase;
   margin-top: 7px;
 }
-.brand-mark {
-  background: var(--green);
-  color: #ffffff;
-  width: 42px;
-  height: 48px;
-  border-radius: 8px;
-  font-size: 30px;
-  display: grid;
-  place-items: center;
-}
 .header-actions {
   display: flex;
   align-items: center;
@@ -268,7 +258,7 @@ small {
   color: var(--muted);
   margin-bottom: 14px;
 }
-.workflow > svg:last-child {
+.workflow > svg.lucide-arrow-right {
   position: absolute;
   right: 21px;
   top: 24px;
@@ -933,11 +923,6 @@ footer > span:last-child {
   .brand {
     font-size: 20px;
   }
-  .brand-mark {
-    width: 34px;
-    height: 41px;
-    font-size: 26px;
-  }
   .brand small {
     font-size: 8px;
   }
@@ -994,7 +979,7 @@ footer > span:last-child {
     float: left;
     margin: 2px 17px 25px 0;
   }
-  .workflow > svg:last-child {
+  .workflow > svg.lucide-arrow-right {
     top: 21px;
   }
   .workflow p {
@@ -1137,7 +1122,6 @@ footer > span:last-child {
 @media (prefers-color-scheme: dark) { :root[data-theme="system"] { --primary-ink: #07111f; } }
 .primary { color: var(--primary-ink); font-size: 14px; min-height: 44px; }
 .primary:hover { background: var(--ink); color: var(--primary-ink); }
-.brand-mark { flex-shrink: 0; font-size: 23px; font-weight: 600; color: var(--primary-ink); }
 .brand { white-space: normal; }
 .brand small { letter-spacing: 0.7px; font-size: 10px; line-height: 1.5; font-weight: 400; }
 .nav button { font-size: 14px; }
@@ -1160,7 +1144,6 @@ footer > span:last-child {
   .header { gap: 10px; }
   .brand { font-size: 18px; letter-spacing: -0.4px; gap: 9px; }
   .brand small { font-size: 9px; }
-  .brand-mark { width: 32px; height: 36px; font-size: 20px; }
   .daily-panel { flex-direction: column; align-items: stretch; }
   .daily-panel h2 { font-size: 27px; }
   .workflow { min-height: 0; }
@@ -1174,3 +1157,30 @@ footer > span:last-child {
 .lookup-panel > button { align-self: flex-start; }
 
 .section-picker button.selected, .section-picker button.selected small { color: var(--ink); }
+
+/* Motion uses transforms only: controls stay in flow and questions remain usable. */
+.progress-track > span { width: 100%; transform-origin: left; }
+@media (prefers-reduced-motion: no-preference) {
+  [data-slot="button"] {
+    transition: transform 140ms ease-out, box-shadow 140ms ease-out;
+  }
+  [data-slot="button"]:active:not(:disabled) { transform: translateY(1px); }
+  [data-slot="button"] > svg { transition: transform 140ms ease-out; }
+  [data-slot="button"]:hover:not(:disabled) > svg.lucide-arrow-right,
+  [data-slot="button"]:focus-visible > svg.lucide-arrow-right { transform: translateX(2px); }
+  .workflow { transition: transform 140ms ease-out, border-color 140ms ease-out; }
+  .question-enter { animation: question-enter 180ms ease-out; }
+  .feedback { animation: feedback-enter 160ms ease-out; }
+  .progress-track > span { transition: transform 180ms ease-out; }
+  @media (hover: hover) and (pointer: fine) {
+    .workflow:hover:not(:disabled) { transform: translateY(-2px); }
+  }
+}
+@keyframes question-enter {
+  from { transform: translateY(6px); }
+  to { transform: translateY(0); }
+}
+@keyframes feedback-enter {
+  from { transform: translateY(4px); }
+  to { transform: translateY(0); }
+}

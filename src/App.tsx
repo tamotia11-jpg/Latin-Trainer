@@ -319,7 +319,6 @@ export default function App() {
           onClick={() => navigate("today")}
           aria-label="GCSE Latin Trainer home"
         >
-          <span className="brand-mark">L</span>
           <span>
             GCSE Latin Trainer
             <small>GCSE vocabulary · 450 words</small>
@@ -476,12 +475,13 @@ export default function App() {
                 <div className="progress-track">
                   <span
                     style={{
-                      width: `${(session.cursor / session.queue.length) * 100}%`,
+                      transform: `scaleX(${session.cursor / session.queue.length})`,
                     }}
                   />
                 </div>
                 {feedback && session.lastGrade && last ? (
                   <article
+                    key={`feedback-${session.id}-${session.cursor}`}
                     className={
                       "recall-card feedback " +
                       (session.settings.mode === "exam"
@@ -568,7 +568,10 @@ export default function App() {
                 ) : (
                   w &&
                   current && (
-                    <article className="recall-card">
+                    <article
+                      className="recall-card question-enter"
+                      key={`question-${session.id}-${session.cursor}`}
+                    >
                       <div className="card-topline">
                         <span>{labels[current.skill]}</span>
                         <span>
