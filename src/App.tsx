@@ -1,3 +1,6 @@
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Card } from "./components/ui/card";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -318,7 +321,7 @@ export default function App() {
         >
           <span className="brand-mark">L</span>
           <span>
-            GCSE Latin <i>Trainer</i>
+            GCSE Latin Trainer
             <small>GCSE vocabulary · 450 words</small>
           </span>
         </button>
@@ -330,12 +333,13 @@ export default function App() {
           >
             <Contrast size={20} />
           </button>
-          <button
+          <Button
+            variant="outline"
             className="account-button"
             onClick={() => navigate("account")}
           >
             <Download size={16} /> Backup & data
-          </button>
+          </Button>
         </div>
       </header>
       <nav className="nav" aria-label="Main navigation">
@@ -422,9 +426,9 @@ export default function App() {
                   ))}
                 </div>
                 <div className="button-row">
-                  <button className="primary" onClick={() => navigate("today")}>
+                  <Button className="primary" onClick={() => navigate("today")}>
                     Choose another practice <ArrowRight size={17} />
-                  </button>
+                  </Button>
                   {session.attempts.some(
                     (a) => a.outcome !== "Exact" && a.outcome !== "Introduced",
                   ) && (
@@ -551,7 +555,7 @@ export default function App() {
                         )}
                       </>
                     )}
-                    <button
+                    <Button
                       ref={next}
                       className="primary"
                       onClick={() => void advance()}
@@ -559,7 +563,7 @@ export default function App() {
                       {session.finished ? "See results" : "Next question"}{" "}
                       <ArrowRight size={18} />
                       <kbd>Enter</kbd>
-                    </button>
+                    </Button>
                   </article>
                 ) : (
                   w &&
@@ -600,12 +604,12 @@ export default function App() {
                             {w.type}{" "}
                             {w.governingCase && ` · governs ${w.governingCase}`}
                           </p>
-                          <button
+                          <Button
                             className="primary"
                             onClick={() => setIntro(false)}
                           >
                             Try active recall <ArrowRight size={18} />
-                          </button>
+                          </Button>
                           <p className="small muted">
                             This first recall follows an introduction and counts
                             as assisted.
@@ -633,13 +637,13 @@ export default function App() {
                             </>
                           )}
                           <div className="button-row">
-                            <button
+                            <Button
                               disabled={busy || intro}
                               className="primary"
                               onClick={() => void answer()}
                             >
                               Continue
-                            </button>
+                            </Button>
                             <button
                               disabled={busy || intro}
                               onClick={() => void answer(true)}
@@ -684,7 +688,7 @@ export default function App() {
                           <label className="sr-only" htmlFor="answer">
                             Your answer
                           </label>
-                          <input
+                          <Input
                             ref={input}
                             id="answer"
                             className="answer-input"
@@ -703,14 +707,14 @@ export default function App() {
                             disabled={busy}
                           />
                           <div className="button-row">
-                            <button
+                            <Button
                               className="primary"
                               disabled={busy || !raw.trim()}
                               type="submit"
                             >
                               {busy ? "Saving…" : "Check answer"}{" "}
                               <kbd>Enter</kbd>
-                            </button>
+                            </Button>
                             <button
                               type="button"
                               className="text-button"
@@ -772,7 +776,7 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <section className="daily-panel">
+            <Card className="daily-panel">
               <div>
                 <p className="eyebrow">Start here</p>
                 <h2>Try 10 Latin words</h2>
@@ -781,7 +785,7 @@ export default function App() {
                   revisit any mistakes.
                 </p>
               </div>
-              <button
+              <Button
                 className="primary"
                 disabled={busy}
                 onClick={() =>
@@ -794,8 +798,8 @@ export default function App() {
                 }
               >
                 Start practice <ArrowRight size={18} />
-              </button>
-            </section>
+              </Button>
+            </Card>
             <div className="workflow-grid">
               {[
                 [
@@ -814,7 +818,8 @@ export default function App() {
                   "exam",
                 ],
               ].map(([title, desc, mode]) => (
-                <button
+                <Button
+                  variant="outline"
                   className="workflow"
                   key={mode}
                   onClick={() => setup(mode as Settings["mode"])}
@@ -823,10 +828,10 @@ export default function App() {
                   <h3>{title}</h3>
                   <p>{desc}</p>
                   <ArrowRight size={17} />
-                </button>
+                </Button>
               ))}
             </div>
-            <section className="panel">
+            <Card className="panel lookup-panel">
               <h2>Look up a word</h2>
               <p>
                 Browse all 450 teacher-supplied words across 15 sections, with
@@ -835,7 +840,7 @@ export default function App() {
               <button onClick={() => navigate("vocabulary")}>
                 Browse vocabulary <ArrowRight size={17} />
               </button>
-            </section>
+            </Card>
           </>
         ) : page === "practice" ? (
           <>
@@ -968,7 +973,7 @@ export default function App() {
                 />
                 <label className="field">
                   Questions{" "}
-                  <input
+                  <Input
                     type="number"
                     min="0"
                     max="900"
@@ -994,13 +999,13 @@ export default function App() {
                     ))}
                   </div>
                 )}
-                <button
+                <Button
                   className="primary"
                   disabled={busy || !settings.sections.length}
                   onClick={() => void start(settings)}
                 >
                   Start session <ArrowRight size={18} />
-                </button>
+                </Button>
               </section>
             </div>
           </>
@@ -1011,7 +1016,7 @@ export default function App() {
             <div className="browse-tools">
               <label className="search">
                 <Search size={18} />
-                <input
+                <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search Latin, meaning or type"
@@ -1347,16 +1352,16 @@ function Backup({
           Export a JSON backup regularly. Import it in the trainer on another
           device to transfer your learning history and current session.
         </p>
-        <button
+        <Button
           className="primary"
           onClick={() => void download()}
           disabled={loading}
         >
           Export progress <Download size={18} />
-        </button>
+        </Button>
         <label className="field">
           Import backup{" "}
-          <input
+          <Input
             type="file"
             accept=".json,application/json"
             disabled={loading}
