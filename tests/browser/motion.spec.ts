@@ -10,7 +10,13 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       page.getByRole("button", { name: "GCSE Latin Trainer home" }),
     ).toContainText("GCSE Latin Trainer");
     await expect(page.locator(".brand-mark")).toHaveCount(0);
-    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      // Let the initial font render finish before observing practice motion.
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      );
+    });
     await page.evaluate(() => {
       const shifts: number[] = [];
       Object.assign(window, { motionLayoutShifts: shifts });
