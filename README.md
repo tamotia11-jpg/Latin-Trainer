@@ -6,7 +6,7 @@ Latest scope (2 October 2026): **GitHub Pages only; no authentication, Supabase 
 
 Practice starts immediately with a 10-word Latin-to-English session. Learn, custom practice, exams, MCQ, flashcards, principal parts, supported grammar and vocabulary lookup remain available. The interface has no returning-user dashboard, historical progress stats or resume prompts. Within-session feedback, results and bounded mistake repeats remain. Existing IndexedDB records, independent FSRS cards and JSON backups stay compatible; opening the trainer does not delete saved data.
 
-The interface uses self-hosted Geist sans-serif, restrained ivory/ink colours, and locally owned shadcn Button, Input and Card components. Light and dark themes retain visible keyboard focus and tested contrast.
+The interface uses self-hosted Geist sans-serif, restrained ivory/ink colours, and locally owned shadcn Button, Input and Card components. Light and dark themes retain visible keyboard focus and tested contrast. Shared CSS motion covers view changes, navigation indicators, selection controls, vocabulary filtering, word dialogs, learning/quiz transitions, feedback, results and backup notices. Transitions use transforms and keep interactions immediate; reduced-motion disables effects. Native select menus retain browser behavior.
 
 **Source repository:** [tamotia11-jpg/Latin-Trainer](https://github.com/tamotia11-jpg/Latin-Trainer). GitHub Pages publication uses the included Actions workflow. No backend credentials are needed. Production deployment verification is recorded in the project Page in Atharv Second Brain.
 

@@ -4,6 +4,7 @@ import App from "./App";
 import "@fontsource-variable/geist";
 import "./ui.css";
 import "./style.css";
+import "./motion.css";
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />

@@ -1157,30 +1157,3 @@ footer > span:last-child {
 .lookup-panel > button { align-self: flex-start; }
 
 .section-picker button.selected, .section-picker button.selected small { color: var(--ink); }
-
-/* Motion uses transforms only: controls stay in flow and questions remain usable. */
-.progress-track > span { width: 100%; transform-origin: left; }
-@media (prefers-reduced-motion: no-preference) {
-  [data-slot="button"] {
-    transition: transform 140ms ease-out, box-shadow 140ms ease-out;
-  }
-  [data-slot="button"]:active:not(:disabled) { transform: translateY(1px); }
-  [data-slot="button"] > svg { transition: transform 140ms ease-out; }
-  [data-slot="button"]:hover:not(:disabled) > svg.lucide-arrow-right,
-  [data-slot="button"]:focus-visible > svg.lucide-arrow-right { transform: translateX(2px); }
-  .workflow { transition: transform 140ms ease-out, border-color 140ms ease-out; }
-  .question-enter { animation: question-enter 180ms ease-out; }
-  .feedback { animation: feedback-enter 160ms ease-out; }
-  .progress-track > span { transition: transform 180ms ease-out; }
-  @media (hover: hover) and (pointer: fine) {
-    .workflow:hover:not(:disabled) { transform: translateY(-2px); }
-  }
-}
-@keyframes question-enter {
-  from { transform: translateY(6px); }
-  to { transform: translateY(0); }
-}
-@keyframes feedback-enter {
-  from { transform: translateY(4px); }
-  to { transform: translateY(0); }
-}

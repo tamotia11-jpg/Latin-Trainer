@@ -36,6 +36,12 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       .click();
     const input = page.getByRole("textbox", { name: "Your answer" });
     await expect(input).toBeFocused();
+    const viewport = page.viewportSize()!;
+    await input.fill("draft");
+    await page.setViewportSize({ width: 320, height: 900 });
+    await expect(input).toHaveValue("draft");
+    await expect(input).toBeFocused();
+    await page.setViewportSize(viewport);
     const questionMotion = await page
       .locator(".question-enter")
       .evaluate((el) => getComputedStyle(el).animationName);
@@ -69,6 +75,115 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         ).motionLayoutShifts.reduce((a, b) => a + b, 0),
       ),
     ).toBe(0);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  });
+}
+
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  test(`whole-app transitions survive interrupted navigation with ${reducedMotion}`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion });
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("./");
+    for (const label of [
+      "Practice",
+      "Vocabulary",
+      "Confusions",
+      "Start",
+      "Practice",
+      "Start",
+    ]) {
+      await page.getByRole("button", { name: label, exact: true }).click();
+      await expect(page.locator(".nav button[aria-current='page']")).toHaveText(
+        label,
+      );
+      expect(
+        await page
+          .locator("main")
+          .evaluate((el) => getComputedStyle(el).animationName),
+      ).toBe(reducedMotion === "reduce" ? "none" : "view-enter");
+    }
+    await page.getByRole("button", { name: "Custom practice" }).click();
+    const section = page.locator(".section-picker button").first();
+    await section.click();
+    await expect(section).toHaveAttribute("aria-pressed", "false");
+    await section.click();
+    await expect(section).toHaveAttribute("aria-pressed", "true");
+    await page.getByLabel("Questions").fill("2");
+    await expect(page.getByLabel("Questions")).toBeFocused();
+    await page.getByRole("button", { name: "Vocabulary", exact: true }).click();
+    const search = page.getByRole("textbox", { name: "Search vocabulary" });
+    for (const text of ["g", "gl", "gladius"]) await search.fill(text);
+    await expect(search).toBeFocused();
+    await expect(page.locator(".word-row")).toHaveCount(1);
+    expect(
+      await page
+        .locator(".vocabulary-list")
+        .evaluate((el) => getComputedStyle(el).animationName),
+    ).toBe(reducedMotion === "reduce" ? "none" : "list-enter");
+    await page
+      .getByRole("button", { name: "Hide meanings", exact: true })
+      .click();
+    await expect(page.locator(".word-row")).toContainText("Meaning hidden");
+    await page
+      .getByRole("button", { name: "Show meanings", exact: true })
+      .click();
+    const word = page.locator(".word-row");
+    for (let i = 0; i < 3; i++) {
+      await word.click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      expect(
+        await page
+          .getByRole("dialog")
+          .evaluate((el) => getComputedStyle(el).animationName),
+      ).toBe(reducedMotion === "reduce" ? "none" : "dialog-enter");
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("dialog")).not.toBeVisible();
+      await expect(word).toBeFocused();
+    }
+    await word.click();
+    await page
+      .getByRole("button", { name: "Practise this direction", exact: true })
+      .first()
+      .click();
+    const answer = page.getByRole("textbox", { name: "Your answer" });
+    await expect(answer).toBeFocused();
+    await answer.fill("sword");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".feedback .eyebrow")).toHaveText("Exact");
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("heading", { name: "Practice results", exact: true }),
+    ).toBeVisible();
+    expect(
+      await page
+        .locator("main")
+        .evaluate((el) => getComputedStyle(el).animationName),
+    ).toBe(reducedMotion === "reduce" ? "none" : "view-enter");
+    await page
+      .getByRole("button", { name: "Backup & data", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Keep what you learn." }),
+    ).toBeVisible();
+    const download = page.waitForEvent("download");
+    await page
+      .getByRole("button", { name: "Export progress", exact: true })
+      .click();
+    expect((await download).suggestedFilename()).toContain(
+      "gcse-latin-trainer",
+    );
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "Choose your practice." }),
+    ).toBeVisible();
+    expect(errors).toEqual([]);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

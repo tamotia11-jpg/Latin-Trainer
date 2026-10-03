@@ -353,7 +353,17 @@ export default function App() {
           </button>
         ))}
       </nav>
-      <main id="main" className="shell">
+      <main
+        id="main"
+        className="shell view-enter"
+        key={
+          session
+            ? session.finished && !feedback
+              ? "results"
+              : `session-${session.id}`
+            : page
+        }
+      >
         {error && (
           <div className="error" role="alert">
             {error}{" "}
@@ -570,7 +580,7 @@ export default function App() {
                   current && (
                     <article
                       className="recall-card question-enter"
-                      key={`question-${session.id}-${session.cursor}`}
+                      key={`question-${session.id}-${session.cursor}-${intro ? "introduction" : "recall"}`}
                     >
                       <div className="card-topline">
                         <span>{labels[current.skill]}</span>
@@ -1055,7 +1065,10 @@ export default function App() {
               {browse.length} entries · Select a word for forms, grammar and
               targeted practice.
             </p>
-            <div className="word-list">
+            <div
+              className="word-list vocabulary-list"
+              key={`${search}-${settings.sections.join(",")}-${hideMeanings}`}
+            >
               {browse.map((w) => (
                 <button
                   className="word-row"

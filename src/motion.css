@@ -1,0 +1,157 @@
+/* Shared motion stays outside layout and never delays state changes or focus. */
+:root {
+  --motion-fast: 140ms;
+  --motion-enter: 180ms;
+  --motion-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.progress-track > span {
+  width: 100%;
+  transform-origin: left;
+}
+.nav button,
+.section-picker button {
+  position: relative;
+}
+.nav button.active {
+  border-bottom-color: transparent;
+}
+.nav button::after,
+.section-picker button::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  background: #b23b2b;
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+.section-picker button::after {
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+}
+.nav button.active::after,
+.section-picker button.selected::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button:not(.brand) {
+    transition:
+      transform var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-fast) ease-out;
+  }
+  button:not(.brand):active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  button > svg.lucide-arrow-right {
+    transition: transform var(--motion-fast) var(--motion-ease);
+  }
+  button:hover:not(:disabled) > svg.lucide-arrow-right,
+  button:focus-visible > svg.lucide-arrow-right {
+    transform: translateX(2px);
+  }
+  input,
+  select {
+    transition: box-shadow var(--motion-fast) ease-out;
+  }
+  input:focus-visible,
+  select:focus-visible {
+    box-shadow: 0 0 0 3px #b23b2b20;
+  }
+  .nav button::after,
+  .section-picker button::after {
+    transition: transform var(--motion-fast) var(--motion-ease);
+  }
+  .view-enter {
+    animation: view-enter var(--motion-enter) var(--motion-ease);
+  }
+  .question-enter {
+    animation: question-enter var(--motion-enter) var(--motion-ease);
+  }
+  .feedback {
+    animation: feedback-enter 160ms var(--motion-ease);
+  }
+  .vocabulary-list {
+    animation: list-enter var(--motion-fast) var(--motion-ease);
+  }
+  dialog[open] {
+    animation: dialog-enter var(--motion-enter) var(--motion-ease);
+  }
+  .hint,
+  .notice,
+  .error,
+  .account-page [role="status"] {
+    animation: feedback-enter var(--motion-fast) var(--motion-ease);
+  }
+  .progress-track > span {
+    transition: transform var(--motion-enter) var(--motion-ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .workflow:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+    .word-row:hover:not(:disabled) > div {
+      transform: translateX(2px);
+    }
+    .word-row > div {
+      transition: transform var(--motion-fast) var(--motion-ease);
+    }
+  }
+}
+@keyframes view-enter {
+  from {
+    transform: translateY(5px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes question-enter {
+  from {
+    transform: translateY(6px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes feedback-enter {
+  from {
+    transform: translateY(4px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes list-enter {
+  from {
+    transform: translateY(2px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes dialog-enter {
+  from {
+    transform: translateY(6px) scale(0.99);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.nav button,
+.nav button.active {
+  font-weight: 500;
+}
